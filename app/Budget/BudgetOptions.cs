@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace Sibvic.ConsoleMoney
+namespace Sibvic.ConsoleMoney.Budget
 {
     [Verb("budget", HelpText = "Budget management.")]
     public class BudgetOptions

@@ -1,4 +1,4 @@
-﻿namespace Sibvic.ConsoleMoney
+﻿namespace Sibvic.ConsoleMoney.Budget
 {
     public class BudgetController(BudgetOptions options, IBudgetReader budgetReader, IBudgetWriter budgetWriter, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
     {

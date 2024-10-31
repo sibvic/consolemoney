@@ -1,5 +1,4 @@
-﻿
-namespace Sibvic.ConsoleMoney
+﻿namespace Sibvic.ConsoleMoney.Budget
 {
     public interface IBudgetWriter
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Sibvic.ConsoleMoney
+namespace Sibvic.ConsoleMoney.Budget
 {
     public class BudgetWriter : IBudgetWriter
     {

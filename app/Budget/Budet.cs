@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sibvic.ConsoleMoney
+namespace Sibvic.ConsoleMoney.Budget
 {
     public record Budget(string Name, string Id);
 }
