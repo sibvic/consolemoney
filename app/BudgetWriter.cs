@@ -4,10 +4,10 @@ namespace Sibvic.ConsoleMoney
 {
     public class BudgetWriter : IBudgetWriter
     {
-        public void WriteToFile(string fileName, IEnumerable<Budget> budgets)
+        public void WriteToFile(string filename, IEnumerable<Budget> budgets)
         {
             var data = JsonConvert.SerializeObject(budgets.ToArray());
-            File.WriteAllText(fileName, data);
+            File.WriteAllText(filename, data);
         }
     }
 }

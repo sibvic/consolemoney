@@ -2,6 +2,6 @@
 {
     public interface IBudgetReader
     {
-        Budget[]? ReadFromFile(string fileName);
+        Budget[]? ReadFromFile(string filename);
     }
 }

@@ -2,16 +2,16 @@
 
 namespace Sibvic.ConsoleMoney
 {
-    public class BudgetReader : IBudgetReader
+    public class SummaryReader : ISummaryReader
     {
-        public Budget[]? ReadFromFile(string filename)
+        public Summary[]? ReadFromFile(string filename)
         {
             if (!File.Exists(filename))
             {
                 return [];
             }
             var data = File.ReadAllText(filename);
-            return JsonConvert.DeserializeObject<Budget[]?>(data) ?? [];
+            return JsonConvert.DeserializeObject<Summary[]?>(data) ?? [];
         }
     }
 }
