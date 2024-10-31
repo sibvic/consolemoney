@@ -18,7 +18,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void Add()
         {
-            var controller = new BudgetController(new BudgetOptions()
+            var controller = new BudgetController(new()
             {
                 Add = true,
                 Name = "name",
@@ -34,7 +34,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void AddEmpty()
         {
-            var controller = new BudgetController(new BudgetOptions()
+            var controller = new BudgetController(new()
             {
                 Add = true,
                 Name = "",
@@ -45,7 +45,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             Assert.AreEqual(-1, controller.Start());
             budgetWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.IsAny<IEnumerable<Budget>>()), Times.Never);
 
-            controller = new BudgetController(new BudgetOptions()
+            controller = new BudgetController(new()
             {
                 Add = true,
                 Name = "name",
