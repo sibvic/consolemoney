@@ -14,16 +14,18 @@
                 var budgets = budgetReader.ReadFromFile("budgets.json").ToList();
                 budgets.Add(new Budget(options.Name, options.Id));
                 budgetWriter.WriteToFile("budgets.json", budgets);
+
+                if (options.InitialAmount.HasValue && !SetInitialAmount(options, summaryReader, summaryWriter, out var summaries))
+                {
+                    return -1;
+                }
+                ShowList(budgets);
                 return 0;
             }
             if (options.Show)
             {
                 var budgets = budgetReader.ReadFromFile("budgets.json").ToArray();
-                Console.WriteLine("List of budgets:");
-                foreach (var budget in budgets)
-                {
-                    Console.WriteLine("- " + budget.Name + "(" + budget.Id + ")");
-                }
+                ShowList(budgets);
                 return 0;
             }
             if (options.SetInitialAmount)
@@ -34,14 +36,11 @@
                     Console.WriteLine("Unknown budget with id " + options.Id);
                     return -1;
                 }
-                var summaries = summaryReader.ReadFromFile("summaries.json").ToList();
-                if (summaries.Any(s => s.BudgetId.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase)))
+                List<Summary> summaries;
+                if (!SetInitialAmount(options, summaryReader, summaryWriter, out summaries))
                 {
-                    Console.WriteLine("Budget with id " + options.Id + " already have initial amount");
                     return -1;
                 }
-                summaries.Add(new Summary(options.Id, options.InitialAmount));
-                summaryWriter.WriteToFile("summaries.json", summaries);
                 Console.WriteLine("Summary:");
                 foreach (var summary in summaries)
                 {
@@ -50,6 +49,28 @@
                 return 0;
             }
             return 0;
+        }
+
+        private static void ShowList(IEnumerable<Budget> budgets)
+        {
+            Console.WriteLine("List of budgets:");
+            foreach (var budget in budgets)
+            {
+                Console.WriteLine("- " + budget.Name + " (" + budget.Id + ")");
+            }
+        }
+
+        private static bool SetInitialAmount(BudgetOptions options, ISummaryReader summaryReader, ISummaryWriter summaryWriter, out List<Summary> summaries)
+        {
+            summaries = summaryReader.ReadFromFile("summaries.json").ToList();
+            if (summaries.Any(s => s.BudgetId.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                Console.WriteLine("Budget with id " + options.Id + " already have initial amount");
+                return false;
+            }
+            summaries.Add(new Summary(options.Id, options.InitialAmount.Value));
+            summaryWriter.WriteToFile("summaries.json", summaries);
+            return true;
         }
     }
 }

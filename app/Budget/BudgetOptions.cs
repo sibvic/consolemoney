@@ -9,9 +9,10 @@ namespace Sibvic.ConsoleMoney.Budget
         public bool Add { get; set; }
         [Option('s', "show", HelpText = "Show list of budgets.")]
         public bool Show { get; set; }
-        [Option('a', "set-initial-amout", HelpText = "Show list of budgets.")]
+        [Option("set-initial-amount", HelpText = "Set initial amount.")]
         public bool SetInitialAmount { get; set; }
-        public double InitialAmount { get; set; }
+        [Option("initial-amount", HelpText = "Initial amount.")]
+        public double? InitialAmount { get; set; }
         [Option('n', "name", HelpText = "Budget name")]
         public string Name { get; set; }
         [Option('i', "id", HelpText = "Budget id")]
