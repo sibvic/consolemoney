@@ -4,13 +4,13 @@ namespace Sibvic.ConsoleMoney
 {
     public class IncomeReader : IIncomeReader
     {
-        public Income[] ReadFromFile(string fileName)
+        public Income[] ReadFromFile(string filename)
         {
-            if (!File.Exists(fileName))
+            if (!File.Exists(filename))
             {
                 return [];
             }
-            var data = File.ReadAllText(fileName);
+            var data = File.ReadAllText(filename);
             return JsonConvert.DeserializeObject<Income[]?>(data) ?? [];
         }
     }

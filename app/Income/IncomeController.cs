@@ -12,7 +12,7 @@
                     return -1;
                 }
                 var incomes = incomeReader.ReadFromFile("incomes.json").ToList();
-                incomes.Add(new Income(options.Name, options.Id));
+                incomes.Add(new Income(options.Name, options.Id, []));
                 incomeWriter.WriteToFile("incomes.json", incomes);
                 return 0;
             }

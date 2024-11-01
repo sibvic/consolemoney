@@ -3,6 +3,7 @@ using Sibvic.ConsoleMoney.Budget;
 
 namespace Sibvic.ConsoleMoney.AppTests
 {
+
     [TestClass]
     public class BudgetControllerTest
     {
