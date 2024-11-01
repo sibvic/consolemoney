@@ -34,7 +34,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             {
                 BudgetId = "main",
                 Comment = "coffee",
-                Amount = 150.05
+                Amount = "150.05"
             });
             budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("main", 450)]);
@@ -58,7 +58,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             {
                 BudgetId = "main2",
                 Comment = "coffee",
-                Amount = 150.05
+                Amount = "150.05"
             });
             budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Spending.Spending(new DateTime(2000, 1, 1), "test", "main", 123.45)]);
