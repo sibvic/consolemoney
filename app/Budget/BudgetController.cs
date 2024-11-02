@@ -51,12 +51,16 @@
             return 0;
         }
 
-        private static void ShowList(IEnumerable<Budget> budgets)
+        private void ShowList(IEnumerable<Budget> budgets)
         {
+            var summaries = summaryReader.ReadFromFile("summaries.json");
             Console.WriteLine("List of budgets:");
             foreach (var budget in budgets)
             {
-                Console.WriteLine("- " + budget.Name + " (" + budget.Id + ")");
+                var amount = summaries.Where(s => s.BudgetId.Equals(budget.Id, StringComparison.InvariantCultureIgnoreCase))
+                    .Select(s => s.Amount)
+                    .FirstOrDefault(0);
+                Console.WriteLine("- " + budget.Name + " (" + budget.Id + "): " + amount);
             }
         }
 
