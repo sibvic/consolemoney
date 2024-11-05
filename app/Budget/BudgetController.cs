@@ -79,8 +79,8 @@ namespace Sibvic.ConsoleMoney.Budget
                             .AddChildren(budget.Id),
                         new Cell { Stroke = LineThickness.None, Align = Align.Right }
                             .AddChildren(summaries.Where(s => s.BudgetId.Equals(budget.Id, StringComparison.InvariantCultureIgnoreCase))
-                    .Select(s => s.Amount)
-                    .FirstOrDefault(0).ToString("n0")),
+                            .Select(s => s.Amount)
+                            .FirstOrDefault(0).ToString("n0")),
                     })
                 );
             ConsoleRenderer.RenderDocument(new Document().AddChildren(table));

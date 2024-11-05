@@ -1,6 +1,7 @@
 ﻿using Sibvic.ConsoleMoney.Budget;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,14 +22,29 @@ namespace Sibvic.ConsoleMoney.Earning
                     Console.WriteLine("Invalid income id " + options.IncomeId);
                     return -1;
                 }
+                double? rate = null;
+                if (options.Rate != null)
+                {
+                    if (!double.TryParse(options.Rate, CultureInfo.InvariantCulture, out var parsedRate))
+                    {
+                        Console.WriteLine("Failed to parse rate " + options.Rate);
+                        return -1;
+                    }
+                    rate = parsedRate;
+                }
                 var earnings = earningReader.ReadFromFile("earnings.json").ToList();
-                earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, options.Amount));
+                earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, options.Amount, rate));
                 earningWriter.WriteToFile("earnings.json", earnings);
 
                 var summaries = summaryReader.ReadFromFile("summaries.json").ToList();
+                var amountWithRate = options.Amount;
+                if (rate.HasValue)
+                {
+                    amountWithRate *= rate.Value;
+                }
                 foreach (var distr in income.Distribushings)
                 {
-                    var incomeAmount = options.Amount * distr.Percent / 100.0;
+                    var incomeAmount = amountWithRate * distr.Percent / 100.0;
                     if (distr.BudgetId == "")
                     {
                         AddDefaultDistributions(budgetReader, income, summaries, incomeAmount);

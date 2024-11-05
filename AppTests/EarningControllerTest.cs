@@ -39,7 +39,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Amount = 100,
                 IncomeId = "main"
             });
-            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200)]);
+            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 new IncomeDistribushing("car", 15),
@@ -68,6 +68,37 @@ namespace Sibvic.ConsoleMoney.AppTests
         }
 
         [TestMethod]
+        public void AddWithRate()
+        {
+            var controller = Create(new()
+            {
+                Add = true,
+                Amount = 100,
+                IncomeId = "main",
+                Rate = "1.78"
+            });
+            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([]);
+            incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
+                new IncomeDistribushing("invest", 10),
+                ])]);
+            summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("invest", 35)]);
+            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns(
+                [
+                    new Budget.Budget("invest_", "invest")
+                ]);
+
+            Assert.AreEqual(0, controller.Start());
+            writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Earning.Earning>>(items =>
+                items.Count() == 1
+                && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == DateTime.Now.Date && items.ElementAt(0).Amount == 100 && items.ElementAt(0).Rate == 1.78
+            )));
+            summaryWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Summary>>(items =>
+                items.Count() == 1
+                && items.ElementAt(0).BudgetId == "invest" && items.ElementAt(0).Amount == 52.8
+            )));
+        }
+
+        [TestMethod]
         public void AddUnknonwIncome()
         {
             var controller = Create(new()
@@ -76,7 +107,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Amount = 100,
                 IncomeId = "main2"
             });
-            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200)]);
+            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [])]);
 
             Assert.AreEqual(-1, controller.Start());
