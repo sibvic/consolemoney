@@ -1,4 +1,8 @@
-﻿namespace Sibvic.ConsoleMoney.Budget
+﻿using Alba.CsConsoleFormat;
+using System.ComponentModel;
+using System.Diagnostics;
+
+namespace Sibvic.ConsoleMoney.Budget
 {
     public class BudgetController(BudgetOptions options, IBudgetReader budgetReader, IBudgetWriter budgetWriter, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
     {
@@ -55,13 +59,31 @@
         {
             var summaries = summaryReader.ReadFromFile("summaries.json");
             Console.WriteLine("List of budgets:");
-            foreach (var budget in budgets)
-            {
-                var amount = summaries.Where(s => s.BudgetId.Equals(budget.Id, StringComparison.InvariantCultureIgnoreCase))
+            var table = new Grid { Stroke = LineThickness.Double, StrokeColor = ConsoleColor.DarkGray }
+                .AddColumns(
+                    new Column { Width = GridLength.Auto },
+                    new Column { Width = GridLength.Auto },
+                    new Column { Width = GridLength.Auto }
+                )
+                .AddChildren(
+                    new Cell { Stroke = LineThickness.Double, Color = ConsoleColor.White }
+                        .AddChildren("Name"),
+                    new Cell { Stroke = LineThickness.Double, Color = ConsoleColor.White }
+                        .AddChildren("Id"),
+                    new Cell { Stroke = LineThickness.Double, Color = ConsoleColor.White }
+                        .AddChildren("Amount"),
+                    budgets.Select(budget => new[] {
+                        new Cell { Stroke = LineThickness.None }
+                            .AddChildren(budget.Name),
+                        new Cell { Stroke = LineThickness.None }
+                            .AddChildren(budget.Id),
+                        new Cell { Stroke = LineThickness.None, Align = Align.Right }
+                            .AddChildren(summaries.Where(s => s.BudgetId.Equals(budget.Id, StringComparison.InvariantCultureIgnoreCase))
                     .Select(s => s.Amount)
-                    .FirstOrDefault(0);
-                Console.WriteLine("- " + budget.Name + " (" + budget.Id + "): " + amount);
-            }
+                    .FirstOrDefault(0).ToString("n0")),
+                    })
+                );
+            ConsoleRenderer.RenderDocument(new Document().AddChildren(table));
         }
 
         private static bool SetInitialAmount(BudgetOptions options, ISummaryReader summaryReader, ISummaryWriter summaryWriter, out List<Summary> summaries)
