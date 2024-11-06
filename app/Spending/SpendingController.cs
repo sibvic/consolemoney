@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Sibvic.ConsoleMoney.Spending
 {
-    public class SpendingController(ISpendingReader spendingReader, ISpendingWriter spendingWriter, IBudgetStorage budgetReader,
+    public class SpendingController(ISpendingStorage spendingStorage, IBudgetStorage budgetReader,
         ISummaryReader summaryReader, ISummaryWriter summaryWriter)
     {
         public int Start(SpendingOptions options)
@@ -20,14 +20,14 @@ namespace Sibvic.ConsoleMoney.Spending
                 Console.WriteLine("Unknown budget " + options.BudgetId);
                 return -1;
             }
-            var spendings = spendingReader.ReadFromFile("spendings.json").ToList();
+            var spendings = spendingStorage.Get().ToList();
             if (!double.TryParse(options.Amount, CultureInfo.InvariantCulture, out var amount))
             {
                 Console.WriteLine("Failed to parse " + options.Amount);
                 return -1;
             }
             spendings.Add(new Spending(DateTime.Now.Date, options.Comment, options.BudgetId, amount));
-            spendingWriter.WriteToFile("spendings.json", spendings);
+            spendingStorage.Save(spendings);
 
             var summaries = summaryReader.ReadFromFile("summaries.json").ToList();
             var summary = summaries.FirstOrDefault(s => s.BudgetId.Equals(options.BudgetId)) ?? new Summary(options.BudgetId, 0);
