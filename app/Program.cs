@@ -8,8 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddTransient<IBudgetStorage, BudgetJsonStorage>();
-builder.Services.AddTransient<ISummaryReader, SummaryReader>();
-builder.Services.AddTransient<ISummaryWriter, SummaryWriter>();
+builder.Services.AddTransient<ISummaryStorage, SummaryJsonStorage>();
 builder.Services.AddTransient<IIncomeStorage, IncomeJsonStorage>();
 builder.Services.AddTransient<IEarningStorage, EarningJsonStorage>();
 builder.Services.AddTransient<ISpendingStorage, SpendingJsonStorage>();

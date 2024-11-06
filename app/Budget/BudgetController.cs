@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Sibvic.ConsoleMoney.Budget
 {
-    public class BudgetController(IBudgetStorage budgetStorage, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
+    public class BudgetController(IBudgetStorage budgetStorage, ISummaryStorage summaryStorage)
     {
         public int Start(BudgetOptions options)
         {
@@ -19,7 +19,7 @@ namespace Sibvic.ConsoleMoney.Budget
                 budgets.Add(new Budget(options.Name, options.Id));
                 budgetStorage.Save(budgets);
 
-                if (options.InitialAmount.HasValue && !SetInitialAmount(options, summaryReader, summaryWriter, out var summaries))
+                if (options.InitialAmount.HasValue && !SetInitialAmount(options, summaryStorage, out var summaries))
                 {
                     return -1;
                 }
@@ -41,7 +41,7 @@ namespace Sibvic.ConsoleMoney.Budget
                     return -1;
                 }
                 List<Summary> summaries;
-                if (!SetInitialAmount(options, summaryReader, summaryWriter, out summaries))
+                if (!SetInitialAmount(options, summaryStorage, out summaries))
                 {
                     return -1;
                 }
@@ -57,7 +57,7 @@ namespace Sibvic.ConsoleMoney.Budget
 
         private void ShowList(IEnumerable<Budget> budgets)
         {
-            var summaries = summaryReader.ReadFromFile("summaries.json");
+            var summaries = summaryStorage.Get();
             Console.WriteLine("List of budgets:");
             var table = new Grid { Stroke = LineThickness.Double, StrokeColor = ConsoleColor.DarkGray }
                 .AddColumns(
@@ -86,16 +86,16 @@ namespace Sibvic.ConsoleMoney.Budget
             ConsoleRenderer.RenderDocument(new Document().AddChildren(table));
         }
 
-        private static bool SetInitialAmount(BudgetOptions options, ISummaryReader summaryReader, ISummaryWriter summaryWriter, out List<Summary> summaries)
+        private static bool SetInitialAmount(BudgetOptions options, ISummaryStorage summaryStorage, out List<Summary> summaries)
         {
-            summaries = summaryReader.ReadFromFile("summaries.json").ToList();
+            summaries = summaryStorage.Get().ToList();
             if (summaries.Any(s => s.BudgetId.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase)))
             {
                 Console.WriteLine("Budget with id " + options.Id + " already have initial amount");
                 return false;
             }
             summaries.Add(new Summary(options.Id, options.InitialAmount.Value));
-            summaryWriter.WriteToFile("summaries.json", summaries);
+            summaryStorage.Save(summaries);
             return true;
         }
     }

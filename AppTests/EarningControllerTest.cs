@@ -13,19 +13,17 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             reader = new Mock<IEarningStorage>();
             incomeReader = new Mock<IIncomeStorage>();
-            summaryReader = new Mock<ISummaryReader>();
-            summaryWriter = new Mock<ISummaryWriter>();
+            summaryReader = new Mock<ISummaryStorage>();
             budgetReader = new Mock<IBudgetStorage>();
         }
         Mock<IIncomeStorage> incomeReader;
         Mock<IEarningStorage> reader;
-        Mock<ISummaryReader> summaryReader;
-        Mock<ISummaryWriter> summaryWriter;
+        Mock<ISummaryStorage> summaryReader;
         Mock<IBudgetStorage> budgetReader;
 
         EarningController Create()
         {
-            return new EarningController(reader.Object, incomeReader.Object, summaryReader.Object, summaryWriter.Object, budgetReader.Object);
+            return new EarningController(reader.Object, incomeReader.Object, summaryReader.Object, budgetReader.Object);
         }
 
         [TestMethod]
@@ -38,7 +36,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 new IncomeDistribushing("car", 15),
                 new IncomeDistribushing("", 1),
                 ])]);
-            summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("invest", 35)]);
+            summaryReader.Setup(r => r.Get()).Returns([new Summary("invest", 35)]);
             budgetReader.Setup(r => r.Get()).Returns(
                 [
                     new Budget.Budget("invest_", "invest"),
@@ -57,7 +55,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == new DateTime(2000, 1, 1) && items.ElementAt(0).Amount == 200
                 && items.ElementAt(1).IncomeId == "main" && items.ElementAt(1).Date == DateTime.Now.Date && items.ElementAt(1).Amount == 100
             )));
-            summaryWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Summary>>(items =>
+            summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
                 items.Count() == 3
                 && items.ElementAt(0).BudgetId == "invest" && items.ElementAt(0).Amount == 45
                 && items.ElementAt(1).BudgetId == "car" && items.ElementAt(1).Amount == 15
@@ -73,7 +71,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 ])]);
-            summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("invest", 35)]);
+            summaryReader.Setup(r => r.Get()).Returns([new Summary("invest", 35)]);
             budgetReader.Setup(r => r.Get()).Returns(
                 [
                     new Budget.Budget("invest_", "invest")
@@ -90,7 +88,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 items.Count() == 1
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == DateTime.Now.Date && items.ElementAt(0).Amount == 100 && items.ElementAt(0).Rate == 1.78
             )));
-            summaryWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Summary>>(items =>
+            summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
                 items.Count() == 1
                 && items.ElementAt(0).BudgetId == "invest" && items.ElementAt(0).Amount == 52.8
             )));

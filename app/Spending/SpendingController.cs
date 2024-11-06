@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Sibvic.ConsoleMoney.Spending
 {
     public class SpendingController(ISpendingStorage spendingStorage, IBudgetStorage budgetReader,
-        ISummaryReader summaryReader, ISummaryWriter summaryWriter)
+        ISummaryStorage summaryStorage)
     {
         public int Start(SpendingOptions options)
         {
@@ -29,12 +29,12 @@ namespace Sibvic.ConsoleMoney.Spending
             spendings.Add(new Spending(DateTime.Now.Date, options.Comment, options.BudgetId, amount));
             spendingStorage.Save(spendings);
 
-            var summaries = summaryReader.ReadFromFile("summaries.json").ToList();
+            var summaries = summaryStorage.Get().ToList();
             var summary = summaries.FirstOrDefault(s => s.BudgetId.Equals(options.BudgetId)) ?? new Summary(options.BudgetId, 0);
             summaries.Remove(summary);
             var newAmount = summary.Amount - amount;
             summaries.Add(new Summary(options.BudgetId, newAmount));
-            summaryWriter.WriteToFile("summaries.json", summaries);
+            summaryStorage.Save(summaries);
 
             Console.WriteLine($"{budget.Name} {summary.Amount} - {options.Amount} => {newAmount}");
             return 0;

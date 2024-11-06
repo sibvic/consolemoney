@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Sibvic.ConsoleMoney.Earning
 {
     public class EarningController(IEarningStorage earningStorage, IIncomeStorage incomeStorage, 
-        ISummaryReader summaryReader, ISummaryWriter summaryWriter, IBudgetStorage budgetReader)
+        ISummaryStorage summaryStorage, IBudgetStorage budgetReader)
     {
         public int Start(EarningOptions options)
         {
@@ -36,7 +36,7 @@ namespace Sibvic.ConsoleMoney.Earning
                 earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, options.Amount, rate));
                 earningStorage.Save(earnings);
 
-                var summaries = summaryReader.ReadFromFile("summaries.json").ToList();
+                var summaries = summaryStorage.Get().ToList();
                 var amountWithRate = options.Amount;
                 if (rate.HasValue)
                 {
@@ -53,7 +53,7 @@ namespace Sibvic.ConsoleMoney.Earning
                     AddIncome(summaries, incomeAmount, distr.BudgetId);
                 }
 
-                summaryWriter.WriteToFile("summaries.json", summaries);
+                summaryStorage.Save(summaries);
                 return 0;
             }
             return 0;
