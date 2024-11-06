@@ -17,23 +17,23 @@ namespace Sibvic.ConsoleMoney.AppTests
         Mock<IIncomeWriter> writer;
         Mock<IBudgetReader> budgetReader;
 
-        IncomeController Create(IncomeOptions options)
+        IncomeController Create()
         {
-            return new IncomeController(options, reader.Object, writer.Object, budgetReader.Object);
+            return new IncomeController(reader.Object, writer.Object, budgetReader.Object);
         }
 
         [TestMethod]
         public void Add()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([]);
+
+            Assert.AreEqual(0, controller.Start(new()
             {
                 Add = true,
                 Name = "name",
                 Id = "n"
-            });
-            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([]);
-
-            Assert.AreEqual(0, controller.Start());
+            }));
             writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Income>>(items =>
                 items.Count() == 1 && items.First().Name == "name" && items.First().Id == "n")));
         }
@@ -41,41 +41,40 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void AddEmpty()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([]);
+
+            Assert.AreEqual(-1, controller.Start(new()
             {
                 Add = true,
                 Name = "",
                 Id = "n"
-            });
-            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([]);
-
-            Assert.AreEqual(-1, controller.Start());
+            }));
             writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.IsAny<IEnumerable<Income>>()), Times.Never);
 
-            controller = Create(new()
+            Assert.AreEqual(-1, controller.Start(new()
             {
                 Add = true,
                 Name = "name",
                 Id = ""
-            });
-            Assert.AreEqual(-1, controller.Start());
+            }));
             writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.IsAny<IEnumerable<Income>>()), Times.Never);
         }
 
         [TestMethod]
         public void SetDistribution()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
+            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+
+            Assert.AreEqual(0, controller.Start(new()
             {
                 SetDistribution = true,
                 Id = "n",
                 BudgetId = "main",
                 DistributionPercent = "14.1"
-            });
-            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
-
-            Assert.AreEqual(0, controller.Start());
+            }));
 
             writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Income>>(items =>
                 items.Count() == 1 && items.First().Id == "n" && items.First().Distribushings.Length == 1
@@ -86,49 +85,49 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void SetDistributionUnknownIncome()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
+            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+
+            Assert.AreEqual(-1, controller.Start(new()
             {
                 SetDistribution = true,
                 Id = "m",
                 BudgetId = "main",
                 DistributionPercent = "14.1"
-            });
-            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
-
-            Assert.AreEqual(-1, controller.Start());
+            }));
         }
 
         [TestMethod]
         public void SetDistributionUnknownBudget()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
+            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+
+            Assert.AreEqual(-1, controller.Start(new()
             {
                 SetDistribution = true,
                 Id = "n",
                 BudgetId = "main2",
                 DistributionPercent = "14.1"
-            });
-            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
-
-            Assert.AreEqual(-1, controller.Start());
+            }));
         }
 
         [TestMethod]
         public void SetDistributionBadPercent()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
+            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+
+            Assert.AreEqual(-1, controller.Start(new()
             {
                 SetDistribution = true,
                 Id = "n",
                 BudgetId = "main",
                 DistributionPercent = "1z4.1"
-            });
-            reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
-
-            Assert.AreEqual(-1, controller.Start());
+            }));
         }
     }
 }

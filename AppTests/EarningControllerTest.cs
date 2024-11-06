@@ -25,20 +25,15 @@ namespace Sibvic.ConsoleMoney.AppTests
         Mock<ISummaryWriter> summaryWriter;
         Mock<IBudgetReader> budgetReader;
 
-        EarningController Create(EarningOptions options)
+        EarningController Create()
         {
-            return new EarningController(options, reader.Object, writer.Object, incomeReader.Object, summaryReader.Object, summaryWriter.Object, budgetReader.Object);
+            return new EarningController(reader.Object, writer.Object, incomeReader.Object, summaryReader.Object, summaryWriter.Object, budgetReader.Object);
         }
 
         [TestMethod]
         public void Add()
         {
-            var controller = Create(new()
-            {
-                Add = true,
-                Amount = 100,
-                IncomeId = "main"
-            });
+            var controller = Create();
             reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
@@ -53,7 +48,12 @@ namespace Sibvic.ConsoleMoney.AppTests
                     new Budget.Budget("coffee", "coffee")
                 ]);
 
-            Assert.AreEqual(0, controller.Start());
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Add = true,
+                Amount = 100,
+                IncomeId = "main"
+            }));
             writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Earning.Earning>>(items =>
                 items.Count() == 2
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == new DateTime(2000, 1, 1) && items.ElementAt(0).Amount == 200
@@ -70,13 +70,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void AddWithRate()
         {
-            var controller = Create(new()
-            {
-                Add = true,
-                Amount = 100,
-                IncomeId = "main",
-                Rate = "1.78"
-            });
+            var controller = Create();
             reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
@@ -87,7 +81,13 @@ namespace Sibvic.ConsoleMoney.AppTests
                     new Budget.Budget("invest_", "invest")
                 ]);
 
-            Assert.AreEqual(0, controller.Start());
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Add = true,
+                Amount = 100,
+                IncomeId = "main",
+                Rate = "1.78"
+            }));
             writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Earning.Earning>>(items =>
                 items.Count() == 1
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == DateTime.Now.Date && items.ElementAt(0).Amount == 100 && items.ElementAt(0).Rate == 1.78
@@ -101,16 +101,16 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void AddUnknonwIncome()
         {
-            var controller = Create(new()
+            var controller = Create();
+            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
+            incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [])]);
+
+            Assert.AreEqual(-1, controller.Start(new()
             {
                 Add = true,
                 Amount = 100,
                 IncomeId = "main2"
-            });
-            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
-            incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [])]);
-
-            Assert.AreEqual(-1, controller.Start());
+            }));
         }
     }
 }

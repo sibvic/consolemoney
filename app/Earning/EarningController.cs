@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Sibvic.ConsoleMoney.Earning
 {
-    public class EarningController(EarningOptions options, IEarningReader earningReader, IEarningWriter earningWriter, IIncomeReader incomeReader, 
+    public class EarningController(IEarningReader earningReader, IEarningWriter earningWriter, IIncomeReader incomeReader, 
         ISummaryReader summaryReader, ISummaryWriter summaryWriter, IBudgetReader budgetReader)
     {
-        public int Start()
+        public int Start(EarningOptions options)
         {
             if (options.Add)
             {

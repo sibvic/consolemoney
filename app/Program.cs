@@ -3,11 +3,32 @@ using Sibvic.ConsoleMoney;
 using Sibvic.ConsoleMoney.Budget;
 using Sibvic.ConsoleMoney.Earning;
 using Sibvic.ConsoleMoney.Spending;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddTransient<IBudgetReader, BudgetReader>();
+builder.Services.AddTransient<IBudgetWriter, BudgetWriter>();
+builder.Services.AddTransient<ISummaryReader, SummaryReader>();
+builder.Services.AddTransient<ISummaryWriter, SummaryWriter>();
+builder.Services.AddTransient<IIncomeReader, IncomeReader>();
+builder.Services.AddTransient<IIncomeWriter, IncomeWriter>();
+builder.Services.AddTransient<IEarningReader, EarningReader>();
+builder.Services.AddTransient<IEarningWriter, EarningWriter>();
+builder.Services.AddTransient<ISpendingReader, SpendingReader>();
+builder.Services.AddTransient<ISpendingWriter, SpendingWriter>();
+builder.Services.AddTransient<BudgetController>();
+builder.Services.AddTransient<IncomeController>();
+builder.Services.AddTransient<EarningController>();
+builder.Services.AddTransient<SpendingController>();
+using IHost host = builder.Build();
+using IServiceScope serviceScope = host.Services.CreateScope();
+IServiceProvider provider = serviceScope.ServiceProvider;
 
 Parser.Default.ParseArguments<BudgetOptions, IncomeOptions, SpendingOptions, EarningOptions>(args)
     .MapResult(
-        (BudgetOptions opts) => new BudgetController(opts, new BudgetReader(), new BudgetWriter(), new SummaryReader(), new SummaryWriter()).Start(),
-        (IncomeOptions opts) => new IncomeController(opts, new IncomeReader(), new IncomeWriter(), new BudgetReader()).Start(),
-        (EarningOptions opts) => new EarningController(opts, new EarningReader(), new EarningWriter(), new IncomeReader(), new SummaryReader(), new SummaryWriter(), new BudgetReader()).Start(),
-        (SpendingOptions opts) => new SpendingController(opts, new SpendingReader(), new SpendingWriter(), new BudgetReader(), new SummaryReader(), new SummaryWriter()).Start(),
+        (BudgetOptions opts) => provider.GetService<BudgetController>().Start(opts),
+        (IncomeOptions opts) => provider.GetService<IncomeController>().Start(opts),
+        (EarningOptions opts) => provider.GetService<EarningController>().Start(opts),
+        (SpendingOptions opts) => provider.GetService<SpendingController>().Start(opts),
         errs => 1);

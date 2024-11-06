@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace Sibvic.ConsoleMoney
 {
-    public class IncomeController(IncomeOptions options, IIncomeReader incomeReader, IIncomeWriter incomeWriter, IBudgetReader budgetReader)
+    public class IncomeController(IIncomeReader incomeReader, IIncomeWriter incomeWriter, IBudgetReader budgetReader)
     {
-        public int Start()
+        public int Start(IncomeOptions options)
         {
             if (options.Add)
             {

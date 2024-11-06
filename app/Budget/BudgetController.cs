@@ -4,9 +4,9 @@ using System.Diagnostics;
 
 namespace Sibvic.ConsoleMoney.Budget
 {
-    public class BudgetController(BudgetOptions options, IBudgetReader budgetReader, IBudgetWriter budgetWriter, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
+    public class BudgetController(IBudgetReader budgetReader, IBudgetWriter budgetWriter, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
     {
-        public int Start()
+        public int Start(BudgetOptions options)
         {
             if (options.Add)
             {
