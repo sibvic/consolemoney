@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Sibvic.ConsoleMoney.Spending
 {
-    public class SpendingController(ISpendingReader spendingReader, ISpendingWriter spendingWriter, IBudgetReader budgetReader,
+    public class SpendingController(ISpendingReader spendingReader, ISpendingWriter spendingWriter, IBudgetStorage budgetReader,
         ISummaryReader summaryReader, ISummaryWriter summaryWriter)
     {
         public int Start(SpendingOptions options)
         {
-            var budgets = budgetReader.ReadFromFile("budgets.json");
+            var budgets = budgetReader.Get();
             var budget = budgets.FirstOrDefault(b => b.Id.Equals(options.BudgetId, StringComparison.InvariantCultureIgnoreCase));
             if (budget == null)
             {

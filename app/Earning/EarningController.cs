@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Sibvic.ConsoleMoney.Earning
 {
     public class EarningController(IEarningReader earningReader, IEarningWriter earningWriter, IIncomeReader incomeReader, 
-        ISummaryReader summaryReader, ISummaryWriter summaryWriter, IBudgetReader budgetReader)
+        ISummaryReader summaryReader, ISummaryWriter summaryWriter, IBudgetStorage budgetReader)
     {
         public int Start(EarningOptions options)
         {
@@ -59,9 +59,9 @@ namespace Sibvic.ConsoleMoney.Earning
             return 0;
         }
 
-        private static void AddDefaultDistributions(IBudgetReader budgetReader, Income? income, List<Summary> summaries, double incomeAmount)
+        private static void AddDefaultDistributions(IBudgetStorage budgetReader, Income? income, List<Summary> summaries, double incomeAmount)
         {
-            var budgets = budgetReader.ReadFromFile("budgets.json")
+            var budgets = budgetReader.Get()
                 .Where(b => !income.Distribushings.Any(d => d.BudgetId.Equals(b.Id, StringComparison.InvariantCultureIgnoreCase)));
             foreach (var budget in budgets)
             {

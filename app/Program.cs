@@ -7,8 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddTransient<IBudgetReader, BudgetReader>();
-builder.Services.AddTransient<IBudgetWriter, BudgetWriter>();
+builder.Services.AddTransient<IBudgetStorage, BudgetJsonStorage>();
 builder.Services.AddTransient<ISummaryReader, SummaryReader>();
 builder.Services.AddTransient<ISummaryWriter, SummaryWriter>();
 builder.Services.AddTransient<IIncomeReader, IncomeReader>();

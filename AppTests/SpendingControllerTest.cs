@@ -12,13 +12,13 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             reader = new Mock<ISpendingReader>();
             writer = new Mock<ISpendingWriter>();
-            budgetReader = new Mock<IBudgetReader>();
+            budgetReader = new Mock<IBudgetStorage>();
             summaryReader = new Mock<ISummaryReader>();
             summaryWriter = new Mock<ISummaryWriter>();
         }
         Mock<ISpendingReader> reader;
         Mock<ISpendingWriter> writer;
-        Mock<IBudgetReader> budgetReader;
+        Mock<IBudgetStorage> budgetReader;
         Mock<ISummaryReader> summaryReader;
         Mock<ISummaryWriter> summaryWriter;
 
@@ -31,7 +31,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void Add()
         {
             var controller = Create();
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("main", 450)]);
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Spending.Spending(new DateTime(2000, 1, 1), "test", "main", 123.45)]);
 
@@ -55,7 +55,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddUnknownBudget()
         {
             var controller = Create();
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Spending.Spending(new DateTime(2000, 1, 1), "test", "main", 123.45)]);
 
             Assert.AreEqual(-1, controller.Start(new()

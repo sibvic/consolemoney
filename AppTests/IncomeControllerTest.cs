@@ -11,11 +11,11 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             reader = new Mock<IIncomeReader>();
             writer = new Mock<IIncomeWriter>();
-            budgetReader = new Mock<IBudgetReader>();
+            budgetReader = new Mock<IBudgetStorage>();
         }
         Mock<IIncomeReader> reader;
         Mock<IIncomeWriter> writer;
-        Mock<IBudgetReader> budgetReader;
+        Mock<IBudgetStorage> budgetReader;
 
         IncomeController Create()
         {
@@ -66,7 +66,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
 
             Assert.AreEqual(0, controller.Start(new()
             {
@@ -87,7 +87,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
@@ -103,7 +103,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
@@ -119,7 +119,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {

@@ -10,26 +10,24 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestInitialize]
         public void Init()
         {
-            budgetReader = new Mock<IBudgetReader>();
-            budgetWriter = new Mock<IBudgetWriter>();
+            budgetReader = new Mock<IBudgetStorage>();
             summaryReader = new Mock<ISummaryReader>();
             summaryWriter = new Mock<ISummaryWriter>();
         }
-        Mock<IBudgetReader> budgetReader;
-        Mock<IBudgetWriter> budgetWriter;
+        Mock<IBudgetStorage> budgetReader;
         Mock<ISummaryReader> summaryReader;
         Mock<ISummaryWriter> summaryWriter;
 
         BudgetController Create()
         {
-            return new BudgetController(budgetReader.Object, budgetWriter.Object, summaryReader.Object, summaryWriter.Object);
+            return new BudgetController(budgetReader.Object, summaryReader.Object, summaryWriter.Object);
         }
 
         [TestMethod]
         public void Add()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([]);
+            budgetReader.Setup(c => c.Get()).Returns([]);
 
             Assert.AreEqual(0, controller.Start(new()
             {
@@ -37,7 +35,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Name = "name",
                 Id = "n"
             }));
-            budgetWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Budget.Budget>>(items =>
+            budgetReader.Verify(w => w.Save(It.Is<IEnumerable<Budget.Budget>>(items =>
                 items.Count() == 1 && items.First().Name == "name" && items.First().Id == "n")));
         }
 
@@ -45,7 +43,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddEmpty()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([]);
+            budgetReader.Setup(c => c.Get()).Returns([]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
@@ -53,7 +51,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Name = "",
                 Id = "n"
             }));
-            budgetWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.IsAny<IEnumerable<Budget.Budget>>()), Times.Never);
+            budgetReader.Verify(w => w.Save(It.IsAny<IEnumerable<Budget.Budget>>()), Times.Never);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
@@ -61,14 +59,14 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Name = "name",
                 Id = ""
             }));
-            budgetWriter.Verify(w => w.WriteToFile(It.IsAny<string>(), It.IsAny<IEnumerable<Budget.Budget>>()), Times.Never);
+            budgetReader.Verify(w => w.Save(It.IsAny<IEnumerable<Budget.Budget>>()), Times.Never);
         }
 
         [TestMethod]
         public void SetAmount()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(0, controller.Start(new()
@@ -87,7 +85,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void SetAmountUnknown()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(-1, controller.Start(new()
@@ -102,7 +100,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void SetAmountDuplicate()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.ReadFromFile(It.IsAny<string>())).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(-1, controller.Start(new()

@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Sibvic.ConsoleMoney
 {
-    public class IncomeController(IIncomeReader incomeReader, IIncomeWriter incomeWriter, IBudgetReader budgetReader)
+    public class IncomeController(IIncomeReader incomeReader, IIncomeWriter incomeWriter, IBudgetStorage budgetReader)
     {
         public int Start(IncomeOptions options)
         {
@@ -22,7 +22,7 @@ namespace Sibvic.ConsoleMoney
             if (options.Show)
             {
                 var incomes = incomeReader.ReadFromFile("Incomes.json").ToList();
-                var budgets = budgetReader.ReadFromFile("budgets.json");
+                var budgets = budgetReader.Get();
                 Console.WriteLine("List of incomes:");
                 foreach (var income in incomes)
                 {
@@ -41,7 +41,7 @@ namespace Sibvic.ConsoleMoney
                 }
                 incomes.Remove(income);
 
-                var budgets = budgetReader.ReadFromFile("budgets.json");
+                var budgets = budgetReader.Get();
                 var budget = budgets.FirstOrDefault(b => b.Id.Equals(options.BudgetId, StringComparison.InvariantCultureIgnoreCase));
                 if (budget == null)
                 {

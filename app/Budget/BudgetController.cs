@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Sibvic.ConsoleMoney.Budget
 {
-    public class BudgetController(IBudgetReader budgetReader, IBudgetWriter budgetWriter, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
+    public class BudgetController(IBudgetStorage budgetStorage, ISummaryReader summaryReader, ISummaryWriter summaryWriter)
     {
         public int Start(BudgetOptions options)
         {
@@ -15,9 +15,9 @@ namespace Sibvic.ConsoleMoney.Budget
                     Console.WriteLine("Budget name and id should be specified");
                     return -1;
                 }
-                var budgets = budgetReader.ReadFromFile("budgets.json").ToList();
+                var budgets = budgetStorage.Get().ToList();
                 budgets.Add(new Budget(options.Name, options.Id));
-                budgetWriter.WriteToFile("budgets.json", budgets);
+                budgetStorage.Save(budgets);
 
                 if (options.InitialAmount.HasValue && !SetInitialAmount(options, summaryReader, summaryWriter, out var summaries))
                 {
@@ -28,13 +28,13 @@ namespace Sibvic.ConsoleMoney.Budget
             }
             if (options.Show)
             {
-                var budgets = budgetReader.ReadFromFile("budgets.json").ToArray();
+                var budgets = budgetStorage.Get().ToArray();
                 ShowList(budgets);
                 return 0;
             }
             if (options.SetInitialAmount)
             {
-                var budgets = budgetReader.ReadFromFile("budgets.json").ToArray();
+                var budgets = budgetStorage.Get().ToArray();
                 if (!budgets.Any(b => b.Id.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     Console.WriteLine("Unknown budget with id " + options.Id);

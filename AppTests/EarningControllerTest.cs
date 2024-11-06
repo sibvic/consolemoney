@@ -16,14 +16,14 @@ namespace Sibvic.ConsoleMoney.AppTests
             incomeReader = new Mock<IIncomeReader>();
             summaryReader = new Mock<ISummaryReader>();
             summaryWriter = new Mock<ISummaryWriter>();
-            budgetReader = new Mock<IBudgetReader>();
+            budgetReader = new Mock<IBudgetStorage>();
         }
         Mock<IIncomeReader> incomeReader;
         Mock<IEarningReader> reader;
         Mock<IEarningWriter> writer;
         Mock<ISummaryReader> summaryReader;
         Mock<ISummaryWriter> summaryWriter;
-        Mock<IBudgetReader> budgetReader;
+        Mock<IBudgetStorage> budgetReader;
 
         EarningController Create()
         {
@@ -41,7 +41,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 new IncomeDistribushing("", 1),
                 ])]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("invest", 35)]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns(
+            budgetReader.Setup(r => r.Get()).Returns(
                 [
                     new Budget.Budget("invest_", "invest"),
                     new Budget.Budget("car_", "car"),
@@ -76,7 +76,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 new IncomeDistribushing("invest", 10),
                 ])]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("invest", 35)]);
-            budgetReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns(
+            budgetReader.Setup(r => r.Get()).Returns(
                 [
                     new Budget.Budget("invest_", "invest")
                 ]);
