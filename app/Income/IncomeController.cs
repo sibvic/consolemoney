@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Sibvic.ConsoleMoney
 {
-    public class IncomeController(IIncomeReader incomeReader, IIncomeWriter incomeWriter, IBudgetStorage budgetReader)
+    public class IncomeController(IIncomeStorage incomeStorage, IBudgetStorage budgetReader)
     {
         public int Start(IncomeOptions options)
         {
@@ -14,14 +14,14 @@ namespace Sibvic.ConsoleMoney
                     Console.WriteLine("Income name and id should be specified");
                     return -1;
                 }
-                var incomes = incomeReader.ReadFromFile("incomes.json").ToList();
+                var incomes = incomeStorage.Get().ToList();
                 incomes.Add(new Income(options.Name, options.Id, []));
-                incomeWriter.WriteToFile("incomes.json", incomes);
+                incomeStorage.Save(incomes);
                 return 0;
             }
             if (options.Show)
             {
-                var incomes = incomeReader.ReadFromFile("Incomes.json").ToList();
+                var incomes = incomeStorage.Get().ToList();
                 var budgets = budgetReader.Get();
                 Console.WriteLine("List of incomes:");
                 foreach (var income in incomes)
@@ -32,7 +32,7 @@ namespace Sibvic.ConsoleMoney
             }
             if (options.SetDistribution)
             {
-                var incomes = incomeReader.ReadFromFile("Incomes.json").ToList();
+                var incomes = incomeStorage.Get().ToList();
                 var income = incomes.FirstOrDefault(i => i.Id.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase));
                 if (income == null)
                 {
@@ -60,7 +60,7 @@ namespace Sibvic.ConsoleMoney
                 distributions.Add(new IncomeDistribushing(options.BudgetId, percent));
                 income = new Income(income.Name, income.Id, distributions.ToArray());
                 incomes.Add(income);
-                incomeWriter.WriteToFile("Incomes.json", incomes);
+                incomeStorage.Save(incomes);
                 PrintIncome(income, budgets);
             }
             return 0;

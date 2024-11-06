@@ -12,12 +12,12 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void Init()
         {
             reader = new Mock<IEarningStorage>();
-            incomeReader = new Mock<IIncomeReader>();
+            incomeReader = new Mock<IIncomeStorage>();
             summaryReader = new Mock<ISummaryReader>();
             summaryWriter = new Mock<ISummaryWriter>();
             budgetReader = new Mock<IBudgetStorage>();
         }
-        Mock<IIncomeReader> incomeReader;
+        Mock<IIncomeStorage> incomeReader;
         Mock<IEarningStorage> reader;
         Mock<ISummaryReader> summaryReader;
         Mock<ISummaryWriter> summaryWriter;
@@ -33,7 +33,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
-            incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
+            incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 new IncomeDistribushing("car", 15),
                 new IncomeDistribushing("", 1),
@@ -70,7 +70,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(r => r.Get()).Returns([]);
-            incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
+            incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 ])]);
             summaryReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Summary("invest", 35)]);
@@ -101,7 +101,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
-            incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [])]);
+            incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [])]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {

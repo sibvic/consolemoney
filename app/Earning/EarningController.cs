@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Sibvic.ConsoleMoney.Earning
 {
-    public class EarningController(IEarningStorage earningStorage, IIncomeReader incomeReader, 
+    public class EarningController(IEarningStorage earningStorage, IIncomeStorage incomeStorage, 
         ISummaryReader summaryReader, ISummaryWriter summaryWriter, IBudgetStorage budgetReader)
     {
         public int Start(EarningOptions options)
         {
             if (options.Add)
             {
-                var incomes = incomeReader.ReadFromFile("incomes.json");
+                var incomes = incomeStorage.Get();
                 var income = incomes.FirstOrDefault(i => i.Id.Equals(options.IncomeId, StringComparison.InvariantCultureIgnoreCase));
                 if (income == null)
                 {
