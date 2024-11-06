@@ -11,30 +11,28 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestInitialize]
         public void Init()
         {
-            reader = new Mock<IEarningReader>();
-            writer = new Mock<IEarningWriter>();
+            reader = new Mock<IEarningStorage>();
             incomeReader = new Mock<IIncomeReader>();
             summaryReader = new Mock<ISummaryReader>();
             summaryWriter = new Mock<ISummaryWriter>();
             budgetReader = new Mock<IBudgetStorage>();
         }
         Mock<IIncomeReader> incomeReader;
-        Mock<IEarningReader> reader;
-        Mock<IEarningWriter> writer;
+        Mock<IEarningStorage> reader;
         Mock<ISummaryReader> summaryReader;
         Mock<ISummaryWriter> summaryWriter;
         Mock<IBudgetStorage> budgetReader;
 
         EarningController Create()
         {
-            return new EarningController(reader.Object, writer.Object, incomeReader.Object, summaryReader.Object, summaryWriter.Object, budgetReader.Object);
+            return new EarningController(reader.Object, incomeReader.Object, summaryReader.Object, summaryWriter.Object, budgetReader.Object);
         }
 
         [TestMethod]
         public void Add()
         {
             var controller = Create();
-            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
+            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 new IncomeDistribushing("car", 15),
@@ -54,7 +52,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Amount = 100,
                 IncomeId = "main"
             }));
-            writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Earning.Earning>>(items =>
+            reader.Verify(w => w.Save(It.Is<IEnumerable<Earning.Earning>>(items =>
                 items.Count() == 2
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == new DateTime(2000, 1, 1) && items.ElementAt(0).Amount == 200
                 && items.ElementAt(1).IncomeId == "main" && items.ElementAt(1).Date == DateTime.Now.Date && items.ElementAt(1).Amount == 100
@@ -71,7 +69,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddWithRate()
         {
             var controller = Create();
-            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([]);
+            reader.Setup(r => r.Get()).Returns([]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 ])]);
@@ -88,7 +86,7 @@ namespace Sibvic.ConsoleMoney.AppTests
                 IncomeId = "main",
                 Rate = "1.78"
             }));
-            writer.Verify(w => w.WriteToFile(It.IsAny<string>(), It.Is<IEnumerable<Earning.Earning>>(items =>
+            reader.Verify(w => w.Save(It.Is<IEnumerable<Earning.Earning>>(items =>
                 items.Count() == 1
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == DateTime.Now.Date && items.ElementAt(0).Amount == 100 && items.ElementAt(0).Rate == 1.78
             )));
@@ -102,7 +100,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddUnknonwIncome()
         {
             var controller = Create();
-            reader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
+            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
             incomeReader.Setup(r => r.ReadFromFile(It.IsAny<string>())).Returns([new Income("main income", "main", [])]);
 
             Assert.AreEqual(-1, controller.Start(new()

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Sibvic.ConsoleMoney.Earning
 {
-    public class EarningController(IEarningReader earningReader, IEarningWriter earningWriter, IIncomeReader incomeReader, 
+    public class EarningController(IEarningStorage earningStorage, IIncomeReader incomeReader, 
         ISummaryReader summaryReader, ISummaryWriter summaryWriter, IBudgetStorage budgetReader)
     {
         public int Start(EarningOptions options)
@@ -32,9 +32,9 @@ namespace Sibvic.ConsoleMoney.Earning
                     }
                     rate = parsedRate;
                 }
-                var earnings = earningReader.ReadFromFile("earnings.json").ToList();
+                var earnings = earningStorage.Get().ToList();
                 earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, options.Amount, rate));
-                earningWriter.WriteToFile("earnings.json", earnings);
+                earningStorage.Save(earnings);
 
                 var summaries = summaryReader.ReadFromFile("summaries.json").ToList();
                 var amountWithRate = options.Amount;
