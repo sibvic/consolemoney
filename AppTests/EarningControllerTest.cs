@@ -95,6 +95,37 @@ namespace Sibvic.ConsoleMoney.AppTests
         }
 
         [TestMethod]
+        public void AddWithRateComma()
+        {
+            var controller = Create();
+            reader.Setup(r => r.Get()).Returns([]);
+            incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
+                new IncomeDistribushing("invest", 10),
+                ])]);
+            summaryReader.Setup(r => r.Get()).Returns([new Summary("invest", 35)]);
+            budgetReader.Setup(r => r.Get()).Returns(
+                [
+                    new Budget.Budget("invest_", "invest")
+                ]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Add = true,
+                Amount = 100,
+                IncomeId = "main",
+                Rate = "1,78"
+            }));
+            reader.Verify(w => w.Save(It.Is<IEnumerable<Earning.Earning>>(items =>
+                items.Count() == 1
+                && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == DateTime.Now.Date && items.ElementAt(0).Amount == 100 && items.ElementAt(0).Rate == 1.78
+            )));
+            summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
+                items.Count() == 1
+                && items.ElementAt(0).BudgetId == "invest" && items.ElementAt(0).Amount == 52.8
+            )));
+        }
+
+        [TestMethod]
         public void AddUnknonwIncome()
         {
             var controller = Create();

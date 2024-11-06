@@ -25,7 +25,7 @@ namespace Sibvic.ConsoleMoney.Earning
                 double? rate = null;
                 if (options.Rate != null)
                 {
-                    if (!double.TryParse(options.Rate, CultureInfo.InvariantCulture, out var parsedRate))
+                    if (!double.TryParse(options.Rate.Replace(',', '.'), CultureInfo.InvariantCulture, out var parsedRate))
                     {
                         Console.WriteLine("Failed to parse rate " + options.Rate);
                         return -1;

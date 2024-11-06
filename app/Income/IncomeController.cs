@@ -52,7 +52,7 @@ namespace Sibvic.ConsoleMoney
                 var distributions = income.Distribushings.ToList();
                 var distribution = distributions.FirstOrDefault(d => d.BudgetId.Equals(options.BudgetId, StringComparison.InvariantCultureIgnoreCase));
                 distributions.Remove(distribution);
-                if (!double.TryParse(options.DistributionPercent, CultureInfo.InvariantCulture, out double percent))
+                if (!double.TryParse(options.DistributionPercent.Replace(',', '.'), CultureInfo.InvariantCulture, out double percent))
                 {
                     Console.WriteLine("Failed to parse value " + options.DistributionPercent);
                     return -1;

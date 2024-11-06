@@ -21,7 +21,7 @@ namespace Sibvic.ConsoleMoney.Spending
                 return -1;
             }
             var spendings = spendingStorage.Get().ToList();
-            if (!double.TryParse(options.Amount, CultureInfo.InvariantCulture, out var amount))
+            if (!double.TryParse(options.Amount.Replace(',', '.'), CultureInfo.InvariantCulture, out var amount))
             {
                 Console.WriteLine("Failed to parse " + options.Amount);
                 return -1;

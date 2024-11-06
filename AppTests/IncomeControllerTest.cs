@@ -81,6 +81,27 @@ namespace Sibvic.ConsoleMoney.AppTests
         }
 
         [TestMethod]
+        public void SetDistributionComma()
+        {
+            var controller = Create();
+            reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                SetDistribution = true,
+                Id = "n",
+                BudgetId = "main",
+                DistributionPercent = "14,1"
+            }));
+
+            reader.Verify(w => w.Save(It.Is<IEnumerable<Income>>(items =>
+                items.Count() == 1 && items.First().Id == "n" && items.First().Distribushings.Length == 1
+                && items.First().Distribushings[0].BudgetId == "main"
+                && items.First().Distribushings[0].Percent == 14.1)));
+        }
+
+        [TestMethod]
         public void SetDistributionUnknownIncome()
         {
             var controller = Create();
