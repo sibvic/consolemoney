@@ -2,9 +2,10 @@
 
 namespace Sibvic.ConsoleMoney.Earning
 {
-    public class EarningJsonStorage : IEarningStorage
+    public class EarningJsonStorage(string homeDir) : IEarningStorage
     {
-        const string filename = "earnings.json";
+        string filename = Path.Combine("earnings.json", homeDir);
+
         public Earning[] Get()
         {
             if (!File.Exists(filename))

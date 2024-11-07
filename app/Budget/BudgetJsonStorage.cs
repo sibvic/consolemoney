@@ -2,9 +2,10 @@
 
 namespace Sibvic.ConsoleMoney.Budget
 {
-    public class BudgetJsonStorage : IBudgetStorage
+    public class BudgetJsonStorage(string homeDir) : IBudgetStorage
     {
-        const string filename = "budgets.json";
+        string filename = Path.Combine("budgets.json", homeDir);
+
         public Budget[] Get()
         {
             if (!File.Exists(filename))

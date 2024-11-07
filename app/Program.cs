@@ -5,13 +5,16 @@ using Sibvic.ConsoleMoney.Earning;
 using Sibvic.ConsoleMoney.Spending;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Reflection;
+
+var homeDir = OptionsStorage.GetHomeDir(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase));
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddTransient<IBudgetStorage, BudgetJsonStorage>();
-builder.Services.AddTransient<ISummaryStorage, SummaryJsonStorage>();
-builder.Services.AddTransient<IIncomeStorage, IncomeJsonStorage>();
-builder.Services.AddTransient<IEarningStorage, EarningJsonStorage>();
-builder.Services.AddTransient<ISpendingStorage, SpendingJsonStorage>();
+builder.Services.AddSingleton<IBudgetStorage>(new BudgetJsonStorage(homeDir));
+builder.Services.AddSingleton<ISummaryStorage>(new SummaryJsonStorage(homeDir));
+builder.Services.AddSingleton<IIncomeStorage>(new IncomeJsonStorage(homeDir));
+builder.Services.AddSingleton<IEarningStorage>(new EarningJsonStorage(homeDir));
+builder.Services.AddSingleton<ISpendingStorage>(new SpendingJsonStorage(homeDir));
 builder.Services.AddTransient<IBudgetPrinter, ConsoleBudgetPrinter>();
 builder.Services.AddTransient<BudgetController>();
 builder.Services.AddTransient<IncomeController>();

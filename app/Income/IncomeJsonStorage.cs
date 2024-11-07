@@ -2,9 +2,10 @@
 
 namespace Sibvic.ConsoleMoney
 {
-    public class IncomeJsonStorage : IIncomeStorage
+    public class IncomeJsonStorage(string homeDir) : IIncomeStorage
     {
-        const string filename = "incomes.json";
+        string filename = Path.Combine("incomes.json", homeDir);
+
         public Income[] Get()
         {
             if (!File.Exists(filename))
