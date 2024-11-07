@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace Sibvic.ConsoleMoney.Budget
 {
     public class BudgetJsonStorage(string homeDir) : IBudgetStorage
     {
-        string filename = Path.Combine("budgets.json", homeDir);
-
+        string filename = Path.Combine(homeDir, "budgets.json");
         public Budget[] Get()
         {
             if (!File.Exists(filename))

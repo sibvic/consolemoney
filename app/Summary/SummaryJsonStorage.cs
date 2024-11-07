@@ -4,7 +4,7 @@ namespace Sibvic.ConsoleMoney
 {
     public class SummaryJsonStorage(string homeDir) : ISummaryStorage
     {
-        string filename = Path.Combine("summaries.json", homeDir);
+        string filename = Path.Combine(homeDir, "summaries.json");
 
         public Summary[] Get()
         {

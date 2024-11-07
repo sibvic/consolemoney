@@ -6,7 +6,7 @@ namespace Sibvic.ConsoleMoney
     {
         public static string GetHomeDir(string optionsPath)
         {
-            var optionsFilePath = Path.Combine(optionsPath + "options.json");
+            var optionsFilePath = Path.Combine(optionsPath, "options.json");
             if (!File.Exists(optionsFilePath))
             {
                 return ".";

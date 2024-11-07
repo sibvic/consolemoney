@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
 
-var homeDir = OptionsStorage.GetHomeDir(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase));
+var homeDir = OptionsStorage.GetHomeDir(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", ""));
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddSingleton<IBudgetStorage>(new BudgetJsonStorage(homeDir));

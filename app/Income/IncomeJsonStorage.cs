@@ -4,7 +4,7 @@ namespace Sibvic.ConsoleMoney
 {
     public class IncomeJsonStorage(string homeDir) : IIncomeStorage
     {
-        string filename = Path.Combine("incomes.json", homeDir);
+        string filename = Path.Combine(homeDir, "incomes.json");
 
         public Income[] Get()
         {

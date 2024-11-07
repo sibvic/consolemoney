@@ -4,7 +4,7 @@ namespace Sibvic.ConsoleMoney.Spending
 {
     public class SpendingJsonStorage(string homeDir) : ISpendingStorage
     {
-        string filename = Path.Combine("spendings.json", homeDir);
+        string filename = Path.Combine(homeDir, "spendings.json");
 
         public Spending[] Get()
         {
