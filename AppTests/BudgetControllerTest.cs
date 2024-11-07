@@ -12,13 +12,15 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             budgetReader = new Mock<IBudgetStorage>();
             summaryReader = new Mock<ISummaryStorage>();
+            budgetPrinter = new Mock<IBudgetPrinter>();
         }
         Mock<IBudgetStorage> budgetReader;
         Mock<ISummaryStorage> summaryReader;
+        Mock<IBudgetPrinter> budgetPrinter;
 
         BudgetController Create()
         {
-            return new BudgetController(budgetReader.Object, summaryReader.Object);
+            return new BudgetController(budgetReader.Object, summaryReader.Object, budgetPrinter.Object);
         }
 
         [TestMethod]

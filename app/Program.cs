@@ -12,6 +12,7 @@ builder.Services.AddTransient<ISummaryStorage, SummaryJsonStorage>();
 builder.Services.AddTransient<IIncomeStorage, IncomeJsonStorage>();
 builder.Services.AddTransient<IEarningStorage, EarningJsonStorage>();
 builder.Services.AddTransient<ISpendingStorage, SpendingJsonStorage>();
+builder.Services.AddTransient<IBudgetPrinter, ConsoleBudgetPrinter>();
 builder.Services.AddTransient<BudgetController>();
 builder.Services.AddTransient<IncomeController>();
 builder.Services.AddTransient<EarningController>();
