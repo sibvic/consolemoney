@@ -9,7 +9,7 @@ namespace Sibvic.ConsoleMoney.Earning
         public bool Add { get; set; }
 
         [Option("amount", Required = true, HelpText = "Amount earned.")]
-        public double Amount { get; set; }
+        public string Amount { get; set; }
 
         [Option("rate", HelpText = "Exchange rate.")]
         public string? Rate { get; set; }

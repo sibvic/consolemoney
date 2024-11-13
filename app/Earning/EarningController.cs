@@ -33,11 +33,16 @@ namespace Sibvic.ConsoleMoney.Earning
                     rate = parsedRate;
                 }
                 var earnings = earningStorage.Get().ToList();
-                earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, options.Amount, rate));
+                if (!double.TryParse(options.Amount.Replace(',', '.'), CultureInfo.InvariantCulture, out var amount))
+                {
+                    Console.WriteLine("Failed to parse rate " + options.Rate);
+                    return -1;
+                }
+                earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, amount, rate));
                 earningStorage.Save(earnings);
 
                 var summaries = summaryStorage.Get().ToList();
-                var amountWithRate = options.Amount;
+                var amountWithRate = amount;
                 if (rate.HasValue)
                 {
                     amountWithRate *= rate.Value;
