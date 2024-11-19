@@ -15,15 +15,18 @@ namespace Sibvic.ConsoleMoney.AppTests
             incomeReader = new Mock<IIncomeStorage>();
             summaryReader = new Mock<ISummaryStorage>();
             budgetReader = new Mock<IBudgetStorage>();
+            budgetPrinter = new Mock<IBudgetPrinter>();
         }
         Mock<IIncomeStorage> incomeReader;
         Mock<IEarningStorage> reader;
         Mock<ISummaryStorage> summaryReader;
         Mock<IBudgetStorage> budgetReader;
+        Mock<IBudgetPrinter> budgetPrinter;
 
         EarningController Create()
         {
-            return new EarningController(reader.Object, incomeReader.Object, summaryReader.Object, budgetReader.Object);
+            return new EarningController(reader.Object, incomeReader.Object, summaryReader.Object,
+                budgetReader.Object, budgetPrinter.Object);
         }
 
         [TestMethod]

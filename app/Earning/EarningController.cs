@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Sibvic.ConsoleMoney.Earning
 {
     public class EarningController(IEarningStorage earningStorage, IIncomeStorage incomeStorage, 
-        ISummaryStorage summaryStorage, IBudgetStorage budgetReader)
+        ISummaryStorage summaryStorage, IBudgetStorage budgetReader, IBudgetPrinter budgetPrinter)
     {
         public int Start(EarningOptions options)
         {
@@ -59,6 +59,7 @@ namespace Sibvic.ConsoleMoney.Earning
                 }
 
                 summaryStorage.Save(summaries);
+                budgetPrinter.Print(budgetReader.Get());
                 return 0;
             }
             return 0;
