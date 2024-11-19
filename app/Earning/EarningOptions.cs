@@ -16,5 +16,8 @@ namespace Sibvic.ConsoleMoney.Earning
 
         [Option("income", HelpText = "Income id")]
         public string IncomeId { get; set; }
+
+        [Option('c', "comment", HelpText = "Comment")]
+        public string? Comment { get; set; }
     }
 }

@@ -38,7 +38,7 @@ namespace Sibvic.ConsoleMoney.Earning
                     Console.WriteLine("Failed to parse rate " + options.Rate);
                     return -1;
                 }
-                earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, amount, rate));
+                earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, amount, rate, options.Comment));
                 earningStorage.Save(earnings);
 
                 var summaries = summaryStorage.Get().ToList();

@@ -30,7 +30,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void Add()
         {
             var controller = Create();
-            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
+            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null, null)]);
             incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 new IncomeDistribushing("car", 15),
@@ -48,12 +48,13 @@ namespace Sibvic.ConsoleMoney.AppTests
             {
                 Add = true,
                 Amount = "100",
-                IncomeId = "main"
+                IncomeId = "main",
+                Comment = "test"
             }));
             reader.Verify(w => w.Save(It.Is<IEnumerable<Earning.Earning>>(items =>
                 items.Count() == 2
                 && items.ElementAt(0).IncomeId == "main" && items.ElementAt(0).Date == new DateTime(2000, 1, 1) && items.ElementAt(0).Amount == 200
-                && items.ElementAt(1).IncomeId == "main" && items.ElementAt(1).Date == DateTime.Now.Date && items.ElementAt(1).Amount == 100
+                && items.ElementAt(1).IncomeId == "main" && items.ElementAt(1).Date == DateTime.Now.Date && items.ElementAt(1).Amount == 100 && items.ElementAt(1).Comment == "test"
             )));
             summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
                 items.Count() == 3
@@ -67,7 +68,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddBadAmount()
         {
             var controller = Create();
-            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
+            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null, null)]);
             incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
                 new IncomeDistribushing("invest", 10),
                 new IncomeDistribushing("car", 15),
@@ -155,7 +156,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddUnknonwIncome()
         {
             var controller = Create();
-            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null)]);
+            reader.Setup(r => r.Get()).Returns([new Earning.Earning("main", new DateTime(2000, 1, 1), 200, null, null)]);
             incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [])]);
 
             Assert.AreEqual(-1, controller.Start(new()
