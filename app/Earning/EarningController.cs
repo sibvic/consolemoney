@@ -35,7 +35,7 @@ namespace Sibvic.ConsoleMoney.Earning
                 var earnings = earningStorage.Get().ToList();
                 if (!double.TryParse(options.Amount.Replace(',', '.'), CultureInfo.InvariantCulture, out var amount))
                 {
-                    Console.WriteLine("Failed to parse rate " + options.Rate);
+                    Console.WriteLine("Failed to parse amount " + options.Amount);
                     return -1;
                 }
                 earnings.Add(new Earning(options.IncomeId, DateTime.Now.Date, amount, rate, options.Comment));

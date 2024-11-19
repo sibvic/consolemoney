@@ -63,6 +63,24 @@ namespace Sibvic.ConsoleMoney.AppTests
         }
 
         [TestMethod]
+        public void TopUp()
+        {
+            var controller = Create();
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "x")]);
+            summaryReader.Setup(r => r.Get()).Returns([new Summary("x", 15.20)]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                TopUp= true,
+                Id = "x",
+                Amount = "100.15"
+            }));
+            summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
+                items.Count() == 1
+                && items.ElementAt(0).BudgetId == "x" && Math.Abs(items.ElementAt(0).Amount - 115.35) < 0.01)));
+        }
+
+        [TestMethod]
         public void SetAmount()
         {
             var controller = Create();
@@ -73,7 +91,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             {
                 SetInitialAmount = true,
                 Id = "z",
-                InitialAmount = 100.15
+                Amount = "100.15"
             }));
             summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
                 items.Count() == 2
@@ -92,7 +110,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             {
                 SetInitialAmount = true,
                 Id = "c",
-                InitialAmount = 100.15
+                Amount = "100.15"
             }));
         }
 
@@ -107,7 +125,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             {
                 SetInitialAmount = true,
                 Id = "x",
-                InitialAmount = 100.15
+                Amount = "100.15"
             }));
         }
     }
