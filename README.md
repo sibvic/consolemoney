@@ -1,2 +1,3 @@
 # Console Money
-Money tracking console app 
+
+Money tracking console app.
