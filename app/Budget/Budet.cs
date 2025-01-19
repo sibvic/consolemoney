@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Sibvic.ConsoleMoney.Budget
 {
-    public record Budget(string Name, string Id);
+    public record Budget(string Name, string Id, double? DefaultPercent);
 }

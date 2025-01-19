@@ -19,5 +19,10 @@ namespace Sibvic.ConsoleMoney.Budget
         public string Name { get; set; }
         [Option('i', "id", HelpText = "Budget id")]
         public string Id { get; set; }
+
+        [Option('p', "set-default-percent", HelpText = "Set default percent.")]
+        public bool SetDefaultPercent { get; set; }
+        [Option("percent", HelpText = "Default percent.")]
+        public string? DefaultPercent { get; set; }
     }
 }

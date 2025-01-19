@@ -52,7 +52,7 @@ namespace Sibvic.ConsoleMoney.Earning
                     var incomeAmount = amountWithRate * distr.Percent / 100.0;
                     if (distr.BudgetId == "")
                     {
-                        AddDefaultDistributions(budgetReader, income, summaries, incomeAmount);
+                        AddDefaultDistributions(budgetReader, income, summaries, incomeAmount, amountWithRate);
                         continue;
                     }
                     AddIncome(summaries, incomeAmount, distr.BudgetId);
@@ -65,12 +65,17 @@ namespace Sibvic.ConsoleMoney.Earning
             return 0;
         }
 
-        private static void AddDefaultDistributions(IBudgetStorage budgetReader, Income? income, List<Summary> summaries, double incomeAmount)
+        private static void AddDefaultDistributions(IBudgetStorage budgetReader, Income? income, List<Summary> summaries, double incomeAmount, 
+            double amountWithRate)
         {
             var budgets = budgetReader.Get()
                 .Where(b => !income.Distribushings.Any(d => d.BudgetId.Equals(b.Id, StringComparison.InvariantCultureIgnoreCase)));
             foreach (var budget in budgets)
             {
+                if (budget.DefaultPercent != null)
+                {
+                    incomeAmount = amountWithRate * budget.DefaultPercent.Value / 100.0;
+                }
                 AddIncome(summaries, incomeAmount, budget.Id);
             }
         }

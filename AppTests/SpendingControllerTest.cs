@@ -27,7 +27,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void Add()
         {
             var controller = Create();
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
             summaryReader.Setup(r => r.Get()).Returns([new Summary("main", 450)]);
             reader.Setup(c => c.Get()).Returns([new Spending.Spending(new DateTime(2000, 1, 1), "test", "main", 123.45)]);
 
@@ -51,7 +51,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddComma()
         {
             var controller = Create();
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
             summaryReader.Setup(r => r.Get()).Returns([new Summary("main", 450)]);
             reader.Setup(c => c.Get()).Returns([new Spending.Spending(new DateTime(2000, 1, 1), "test", "main", 123.45)]);
 
@@ -75,7 +75,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void AddUnknownBudget()
         {
             var controller = Create();
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
             reader.Setup(c => c.Get()).Returns([new Spending.Spending(new DateTime(2000, 1, 1), "test", "main", 123.45)]);
 
             Assert.AreEqual(-1, controller.Start(new()

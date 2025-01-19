@@ -39,6 +39,23 @@ namespace Sibvic.ConsoleMoney.AppTests
                 items.Count() == 1 && items.First().Name == "name" && items.First().Id == "n")));
         }
 
+         [TestMethod]
+        public void AddWithDefaultPercent()
+        {
+            var controller = Create();
+            budgetReader.Setup(c => c.Get()).Returns([]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Add = true,
+                Name = "name",
+                Id = "n",
+                DefaultPercent = "0.01"
+            }));
+            budgetReader.Verify(w => w.Save(It.Is<IEnumerable<Budget.Budget>>(static items =>
+                items.Count() == 1 && items.First().Name == "name" && items.First().Id == "n" && items.First().DefaultPercent == 0.01)));
+        }
+
         [TestMethod]
         public void AddEmpty()
         {
@@ -66,7 +83,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void TopUp()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "x", null)]);
             summaryReader.Setup(r => r.Get()).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(0, controller.Start(new()
@@ -81,10 +98,27 @@ namespace Sibvic.ConsoleMoney.AppTests
         }
 
         [TestMethod]
+        public void SetPercent()
+        {
+            var controller = Create();
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z", null)]);
+            summaryReader.Setup(r => r.Get()).Returns([new Summary("x", 15.20)]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                SetDefaultPercent = true,
+                Id = "z",
+                DefaultPercent = "0.01"
+            }));
+            budgetReader.Verify(w => w.Save(It.Is<IEnumerable<Budget.Budget>>(static items =>
+                items.Count() == 1 && items.First().Name == "" && items.First().Id == "z" && items.First().DefaultPercent == 0.01)));
+        }
+
+        [TestMethod]
         public void SetAmount()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z", null), new Budget.Budget("", "x", null)]);
             summaryReader.Setup(r => r.Get()).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(0, controller.Start(new()
@@ -103,7 +137,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void SetAmountUnknown()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z", null), new Budget.Budget("", "x", null)]);
             summaryReader.Setup(r => r.Get()).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(-1, controller.Start(new()
@@ -118,7 +152,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void SetAmountDuplicate()
         {
             var controller = Create();
-            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z"), new Budget.Budget("", "x")]);
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("", "z", null), new Budget.Budget("", "x", null)]);
             summaryReader.Setup(r => r.Get()).Returns([new Summary("x", 15.20)]);
 
             Assert.AreEqual(-1, controller.Start(new()

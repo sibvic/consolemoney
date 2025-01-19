@@ -18,7 +18,15 @@ namespace Sibvic.ConsoleMoney.Budget
                     return -1;
                 }
                 var budgets = budgetStorage.Get().ToList();
-                budgets.Add(new Budget(options.Name, options.Id));
+                try
+                {
+                    budgets.Add(new Budget(options.Name, options.Id, ParsePercent(options.DefaultPercent)));
+                }
+                catch (ParsingErrorException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return -1;
+                }
                 budgetStorage.Save(budgets);
                 if (!string.IsNullOrEmpty(options.Amount))
                 {
@@ -36,10 +44,34 @@ namespace Sibvic.ConsoleMoney.Budget
                 budgetPrinter.Print(budgets);
                 return 0;
             }
+            if (options.SetDefaultPercent)
+            {
+                var budgets = budgetStorage.Get().ToList();
+                var budget = FindBudget(options.Id, budgets);
+                if (budget == null)
+                {
+                    Console.WriteLine("Unknown budget with id " + options.Id);
+                    return -1;
+                }
+                budgets.Remove(budget);
+                try
+                {
+                    budgets.Add(new Budget(budget.Name, budget.Id, ParsePercent(options.DefaultPercent)));
+                }
+                catch (ParsingErrorException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return -1;
+                }
+                budgetStorage.Save(budgets);
+                budgetPrinter.Print(budgets);
+
+                return 0;
+            }
             if (options.SetInitialAmount)
             {
                 var budgets = budgetStorage.Get().ToArray();
-                if (!budgets.Any(b => b.Id.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase)))
+                if (!BudgetExists(options.Id, budgets))
                 {
                     Console.WriteLine("Unknown budget with id " + options.Id);
                     return -1;
@@ -59,7 +91,7 @@ namespace Sibvic.ConsoleMoney.Budget
             if (options.TopUp)
             {
                 var budgets = budgetStorage.Get().ToArray();
-                if (!budgets.Any(b => b.Id.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase)))
+                if (!BudgetExists(options.Id, budgets))
                 {
                     Console.WriteLine("Unknown budget with id " + options.Id);
                     return -1;
@@ -84,6 +116,30 @@ namespace Sibvic.ConsoleMoney.Budget
                 budgetPrinter.Print(budgets);
             }
             return 0;
+        }
+
+        private static bool BudgetExists(string id, IEnumerable<Budget> budgets)
+        {
+            var budget = FindBudget(id, budgets);
+            return budget != null;
+        }
+
+        private static Budget? FindBudget(string id, IEnumerable<Budget> budgets)
+        {
+            return budgets.FirstOrDefault(b => b.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private static double? ParsePercent(string? defaultPercent)
+        {
+            if (string.IsNullOrEmpty(defaultPercent))
+            {
+                return null;
+            }
+            if (!double.TryParse(defaultPercent.Replace(',', '.'), CultureInfo.InvariantCulture, out var amount))
+            {
+                throw new ParsingErrorException("Failed to parse amount" + defaultPercent);
+            }
+            return amount;
         }
 
         private static bool SetInitialAmount(BudgetOptions options, ISummaryStorage summaryStorage, out List<Summary> summaries)

@@ -64,7 +64,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
 
             Assert.AreEqual(0, controller.Start(new()
             {
@@ -85,7 +85,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
 
             Assert.AreEqual(0, controller.Start(new()
             {
@@ -106,7 +106,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
@@ -122,7 +122,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
@@ -138,7 +138,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var controller = Create();
             reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
-            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main")]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null)]);
 
             Assert.AreEqual(-1, controller.Start(new()
             {
