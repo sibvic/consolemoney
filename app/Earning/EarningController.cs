@@ -47,15 +47,21 @@ namespace Sibvic.ConsoleMoney.Earning
                 {
                     amountWithRate *= rate.Value;
                 }
+                bool defaultDistributionsAdded = false;
                 foreach (var distr in income.Distribushings)
                 {
                     var incomeAmount = amountWithRate * distr.Percent / 100.0;
                     if (distr.BudgetId == "")
                     {
-                        AddDefaultDistributions(budgetReader, income, summaries, incomeAmount, amountWithRate);
+                        AddDefaultDistributions(budgetReader, income.Distribushings, summaries, incomeAmount, amountWithRate);
+                        defaultDistributionsAdded = true;
                         continue;
                     }
                     AddIncome(summaries, incomeAmount, distr.BudgetId);
+                }
+                if (!defaultDistributionsAdded)
+                {
+                    AddDefaultDistributions(budgetReader, [], summaries, 0, amountWithRate);
                 }
 
                 summaryStorage.Save(summaries);
@@ -65,18 +71,22 @@ namespace Sibvic.ConsoleMoney.Earning
             return 0;
         }
 
-        private static void AddDefaultDistributions(IBudgetStorage budgetReader, Income? income, List<Summary> summaries, double incomeAmount, 
+        private static void AddDefaultDistributions(IBudgetStorage budgetReader, IncomeDistribushing[] distribushings, List<Summary> summaries, double incomeAmount, 
             double amountWithRate)
         {
             var budgets = budgetReader.Get()
-                .Where(b => !income.Distribushings.Any(d => d.BudgetId.Equals(b.Id, StringComparison.InvariantCultureIgnoreCase)));
+                .Where(b => !distribushings.Any(d => d.BudgetId.Equals(b.Id, StringComparison.InvariantCultureIgnoreCase)));
             foreach (var budget in budgets)
             {
+                double amountToAdd = incomeAmount;
                 if (budget.DefaultPercent != null)
                 {
-                    incomeAmount = amountWithRate * budget.DefaultPercent.Value / 100.0;
+                    amountToAdd = amountWithRate * budget.DefaultPercent.Value / 100.0;
                 }
-                AddIncome(summaries, incomeAmount, budget.Id);
+                if (amountToAdd > 0)
+                {
+                    AddIncome(summaries, amountToAdd, budget.Id);
+                }
             }
         }
 
