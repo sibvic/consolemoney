@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace Sibvic.ConsoleMoney.Earning
 {
     public class EarningController(IEarningStorage earningStorage, IIncomeStorage incomeStorage, 
-        ISummaryStorage summaryStorage, IBudgetStorage budgetReader, IBudgetPrinter budgetPrinter)
+        ISummaryStorage summaryStorage, IBudgetStorage budgetReader, IBudgetPrinter budgetPrinter,
+        IEarningsPrinter earningsPrinter)
     {
         public int Start(EarningOptions options)
         {
@@ -66,6 +67,13 @@ namespace Sibvic.ConsoleMoney.Earning
 
                 summaryStorage.Save(summaries);
                 budgetPrinter.Print(budgetReader.Get());
+                return 0;
+            }
+            if (options.Show)
+            {
+                var earnings = earningStorage.Get();
+                var n = options.Number ?? 10; // Default to showing last 10 earnings if not specified
+                earningsPrinter.PrintLastNEarnings(earnings, n);
                 return 0;
             }
             return 0;

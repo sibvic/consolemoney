@@ -16,17 +16,19 @@ namespace Sibvic.ConsoleMoney.AppTests
             summaryReader = new Mock<ISummaryStorage>();
             budgetReader = new Mock<IBudgetStorage>();
             budgetPrinter = new Mock<IBudgetPrinter>();
+            earningsPrinter = new Mock<IEarningsPrinter>();
         }
         Mock<IIncomeStorage> incomeReader;
         Mock<IEarningStorage> reader;
         Mock<ISummaryStorage> summaryReader;
         Mock<IBudgetStorage> budgetReader;
         Mock<IBudgetPrinter> budgetPrinter;
+        Mock<IEarningsPrinter> earningsPrinter;
 
         EarningController Create()
         {
             return new EarningController(reader.Object, incomeReader.Object, summaryReader.Object,
-                budgetReader.Object, budgetPrinter.Object);
+                budgetReader.Object, budgetPrinter.Object, earningsPrinter.Object);
         }
 
         [TestMethod]
@@ -282,5 +284,73 @@ namespace Sibvic.ConsoleMoney.AppTests
                 IncomeId = "main2"
             }));
         }
+
+        #region Show last N earnings
+        [TestMethod]
+        public void ShowLastNEarnings()
+        {
+            var controller = Create();
+            var earnings = new[]
+            {
+                new Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
+                new Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X"),
+                new Earning("consulting", new DateTime(2024, 3, 10), 750, 1.25, "Client Y"),
+                new Earning("bonus", new DateTime(2024, 3, 5), 300, null, "Q1 bonus"),
+                new Earning("main", new DateTime(2024, 3, 1), 1000, 1.0, "February salary")
+            };
+            reader.Setup(r => r.Get()).Returns(earnings);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Show = true,
+                Number = 3
+            }));
+
+            earningsPrinter.Verify(p => p.PrintLastNEarnings(
+                It.Is<IEnumerable<Earning>>(e => e.Count() == 5), 
+                3
+            ));
+        }
+
+        [TestMethod]
+        public void ShowLastNEarningsDefaultNumber()
+        {
+            var controller = Create();
+            var earnings = new[]
+            {
+                new Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
+                new Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X")
+            };
+            reader.Setup(r => r.Get()).Returns(earnings);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Show = true
+            }));
+
+            earningsPrinter.Verify(p => p.PrintLastNEarnings(
+                It.Is<IEnumerable<Earning>>(e => e.Count() == 2), 
+                10
+            ));
+        }
+
+        [TestMethod]
+        public void ShowLastNEarningsEmpty()
+        {
+            var controller = Create();
+            reader.Setup(r => r.Get()).Returns(Array.Empty<Earning>());
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Show = true,
+                Number = 5
+            }));
+
+            earningsPrinter.Verify(p => p.PrintLastNEarnings(
+                It.Is<IEnumerable<Earning>>(e => !e.Any()), 
+                5
+            ));
+        }
+        #endregion
     }
 }
