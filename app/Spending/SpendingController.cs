@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Sibvic.ConsoleMoney.Spending
 {
     public class SpendingController(ISpendingStorage spendingStorage, IBudgetStorage budgetReader,
-        ISummaryStorage summaryStorage)
+        ISummaryStorage summaryStorage, ISpendingPrinter spendingPrinter)
     {
         public int Start(SpendingOptions options)
         {
@@ -36,7 +36,7 @@ namespace Sibvic.ConsoleMoney.Spending
             summaries.Add(new Summary(options.BudgetId, newAmount));
             summaryStorage.Save(summaries);
 
-            Console.WriteLine($"{budget.Name} {summary.Amount} - {options.Amount} => {newAmount}");
+            spendingPrinter.PrintSpendingResult(budget, summary.Amount, amount, newAmount);
             return 0;
         }
     }

@@ -292,11 +292,11 @@ namespace Sibvic.ConsoleMoney.AppTests
             var controller = Create();
             var earnings = new[]
             {
-                new Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
-                new Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X"),
-                new Earning("consulting", new DateTime(2024, 3, 10), 750, 1.25, "Client Y"),
-                new Earning("bonus", new DateTime(2024, 3, 5), 300, null, "Q1 bonus"),
-                new Earning("main", new DateTime(2024, 3, 1), 1000, 1.0, "February salary")
+                new Earning.Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
+                new Earning.Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X"),
+                new Earning.Earning("consulting", new DateTime(2024, 3, 10), 750, 1.25, "Client Y"),
+                new Earning.Earning("bonus", new DateTime(2024, 3, 5), 300, null, "Q1 bonus"),
+                new Earning.Earning("main", new DateTime(2024, 3, 1), 1000, 1.0, "February salary")
             };
             reader.Setup(r => r.Get()).Returns(earnings);
 
@@ -307,7 +307,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             }));
 
             earningsPrinter.Verify(p => p.PrintLastNEarnings(
-                It.Is<IEnumerable<Earning>>(e => e.Count() == 5), 
+                It.Is<IEnumerable<Earning.Earning>>(e => e.Count() == 5), 
                 3
             ));
         }
@@ -318,8 +318,8 @@ namespace Sibvic.ConsoleMoney.AppTests
             var controller = Create();
             var earnings = new[]
             {
-                new Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
-                new Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X")
+                new Earning.Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
+                new Earning.Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X")
             };
             reader.Setup(r => r.Get()).Returns(earnings);
 
@@ -329,7 +329,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             }));
 
             earningsPrinter.Verify(p => p.PrintLastNEarnings(
-                It.Is<IEnumerable<Earning>>(e => e.Count() == 2), 
+                It.Is<IEnumerable<Earning.Earning>>(e => e.Count() == 2), 
                 10
             ));
         }
@@ -338,7 +338,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         public void ShowLastNEarningsEmpty()
         {
             var controller = Create();
-            reader.Setup(r => r.Get()).Returns(Array.Empty<Earning>());
+            reader.Setup(r => r.Get()).Returns(Array.Empty<Earning.Earning>());
 
             Assert.AreEqual(0, controller.Start(new()
             {
@@ -347,7 +347,7 @@ namespace Sibvic.ConsoleMoney.AppTests
             }));
 
             earningsPrinter.Verify(p => p.PrintLastNEarnings(
-                It.Is<IEnumerable<Earning>>(e => !e.Any()), 
+                It.Is<IEnumerable<Earning.Earning>>(e => !e.Any()), 
                 5
             ));
         }

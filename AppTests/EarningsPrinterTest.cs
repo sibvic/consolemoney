@@ -34,11 +34,11 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var earnings = new[]
             {
-                new Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
-                new Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X"),
-                new Earning("consulting", new DateTime(2024, 3, 10), 750, 1.25, "Client Y"),
-                new Earning("bonus", new DateTime(2024, 3, 5), 300, null, "Q1 bonus"),
-                new Earning("main", new DateTime(2024, 3, 1), 1000, 1.0, "February salary")
+                new Earning.Earning("main", new DateTime(2024, 3, 20), 1000, 1.0, "March salary"),
+                new Earning.Earning("freelance", new DateTime(2024, 3, 15), 500, null, "Project X"),
+                new Earning.Earning("consulting", new DateTime(2024, 3, 10), 750, 1.25, "Client Y"),
+                new Earning.Earning("bonus", new DateTime(2024, 3, 5), 300, null, "Q1 bonus"),
+                new Earning.Earning("main", new DateTime(2024, 3, 1), 1000, 1.0, "February salary")
             };
 
             printer.PrintLastNEarnings(earnings, 3);
@@ -56,7 +56,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         [TestMethod]
         public void PrintLastNEarnings_EmptyList_ShowsNoEarningsMessage()
         {
-            printer.PrintLastNEarnings(Array.Empty<Earning>(), 5);
+            printer.PrintLastNEarnings(Array.Empty<Earning.Earning>(), 5);
 
             var output = consoleOutput.ToString();
             Assert.AreEqual("No earnings found." + Environment.NewLine, output);
@@ -67,7 +67,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var earnings = new[]
             {
-                new Earning("main", new DateTime(2024, 3, 20), 1000.50, 1.25, "Test comment")
+                new Earning.Earning("main", new DateTime(2024, 3, 20), 1000.50, 1.25, "Test comment")
             };
 
             printer.PrintLastNEarnings(earnings, 1);
@@ -88,7 +88,7 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             var earnings = new[]
             {
-                new Earning("main", new DateTime(2024, 3, 20), 1000.50, null, null)
+                new Earning.Earning("main", new DateTime(2024, 3, 20), 1000.50, null, null)
             };
 
             printer.PrintLastNEarnings(earnings, 1);
