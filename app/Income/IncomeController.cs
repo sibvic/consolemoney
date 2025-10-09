@@ -1,9 +1,10 @@
 ﻿using Sibvic.ConsoleMoney.Budget;
+using Sibvic.ConsoleMoney.Earning;
 using System.Globalization;
 
 namespace Sibvic.ConsoleMoney
 {
-    public class IncomeController(IIncomeStorage incomeStorage, IBudgetStorage budgetReader)
+    public class IncomeController(IIncomeStorage incomeStorage, IBudgetStorage budgetReader, IEarningStorage earningStorage, IIncomeSummaryPrinter summaryPrinter)
     {
         public int Start(IncomeOptions options)
         {
@@ -28,6 +29,13 @@ namespace Sibvic.ConsoleMoney
                 {
                     PrintIncome(income, budgets);
                 }
+                return 0;
+            }
+            if (options.Summary)
+            {
+                var incomes = incomeStorage.Get();
+                var earnings = earningStorage.Get();
+                summaryPrinter.PrintMonthlySummary(earnings, incomes, 12);
                 return 0;
             }
             if (options.SetDistribution)

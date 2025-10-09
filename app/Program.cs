@@ -18,6 +18,7 @@ builder.Services.AddSingleton<ISpendingStorage>(new SpendingJsonStorage(homeDir)
 builder.Services.AddTransient<IBudgetPrinter, ConsoleBudgetPrinter>();
 builder.Services.AddTransient<IEarningsPrinter, ConsoleEarningsPrinter>();
 builder.Services.AddTransient<ISpendingPrinter, ConsoleSpendingPrinter>();
+builder.Services.AddTransient<IIncomeSummaryPrinter, ConsoleIncomeSummaryPrinter>();
 builder.Services.AddTransient<BudgetController>();
 builder.Services.AddTransient<IncomeController>();
 builder.Services.AddTransient<EarningController>();

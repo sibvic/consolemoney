@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Sibvic.ConsoleMoney.Budget;
+using Sibvic.ConsoleMoney.Earning;
 
 namespace Sibvic.ConsoleMoney.AppTests
 {
@@ -11,13 +12,17 @@ namespace Sibvic.ConsoleMoney.AppTests
         {
             reader = new Mock<IIncomeStorage>();
             budgetReader = new Mock<IBudgetStorage>();
+            earningStorage = new Mock<IEarningStorage>();
+            summaryPrinter = new Mock<IIncomeSummaryPrinter>();
         }
         Mock<IIncomeStorage> reader;
         Mock<IBudgetStorage> budgetReader;
+        Mock<IEarningStorage> earningStorage;
+        Mock<IIncomeSummaryPrinter> summaryPrinter;
 
         IncomeController Create()
         {
-            return new IncomeController(reader.Object, budgetReader.Object);
+            return new IncomeController(reader.Object, budgetReader.Object, earningStorage.Object, summaryPrinter.Object);
         }
 
         [TestMethod]

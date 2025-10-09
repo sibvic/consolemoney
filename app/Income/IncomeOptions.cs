@@ -9,6 +9,8 @@ namespace Sibvic.ConsoleMoney
         public bool Add { get; set; }
         [Option('s', "show", HelpText = "Show list of incomes.")]
         public bool Show { get; set; }
+        [Option("summary", HelpText = "Show monthly income summary for last 12 months.")]
+        public bool Summary { get; set; }
         [Option('d', "distr", HelpText = "Set distribution.")]
         public bool SetDistribution { get; set; }
         [Option("budget", HelpText = "Budget id.")]
