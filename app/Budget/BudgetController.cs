@@ -1,12 +1,8 @@
-﻿using Alba.CsConsoleFormat;
-using Sibvic.ConsoleMoney.Earning;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace Sibvic.ConsoleMoney.Budget
 {
-    public class BudgetController(IBudgetStorage budgetStorage, ISummaryStorage summaryStorage, IBudgetPrinter budgetPrinter)
+    public class BudgetController(IBudgetStorage budgetStorage, ISummaryStorage summaryStorage, IBudgetPrinter budgetPrinter, IIncomeStorage incomeStorage)
     {
         public int Start(BudgetOptions options)
         {
@@ -53,10 +49,15 @@ namespace Sibvic.ConsoleMoney.Budget
                     Console.WriteLine("Unknown budget with id " + options.Id);
                     return -1;
                 }
+                if (budget.IsHistoric)
+                {
+                    Console.WriteLine("Cannot set default percent for historic budget " + options.Id);
+                    return -1;
+                }
                 budgets.Remove(budget);
                 try
                 {
-                    budgets.Add(new Budget(budget.Name, budget.Id, ParsePercent(options.DefaultPercent)));
+                    budgets.Add(new Budget(budget.Name, budget.Id, ParsePercent(options.DefaultPercent), budget.IsHistoric));
                 }
                 catch (ParsingErrorException ex)
                 {
@@ -115,6 +116,103 @@ namespace Sibvic.ConsoleMoney.Budget
                 summaryStorage.Save(summaries);
                 budgetPrinter.Print(budgets);
             }
+            if (options.Close)
+            {
+                return CloseBudget(options);
+            }
+            return 0;
+        }
+
+        private int CloseBudget(BudgetOptions options)
+        {
+            if (string.IsNullOrEmpty(options.Id) || string.IsNullOrEmpty(options.MoveTo))
+            {
+                Console.WriteLine("Budget id and move-to budget id should be specified");
+                return -1;
+            }
+            if (options.Id.Equals(options.MoveTo, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine("Cannot move remaining balance to the same budget");
+                return -1;
+            }
+
+            var budgets = budgetStorage.Get().ToList();
+            var budget = FindBudget(options.Id, budgets);
+            if (budget == null)
+            {
+                Console.WriteLine("Unknown budget with id " + options.Id);
+                return -1;
+            }
+            if (budget.IsHistoric)
+            {
+                Console.WriteLine("Budget with id " + options.Id + " is already historic");
+                return -1;
+            }
+
+            var targetBudget = FindBudget(options.MoveTo, budgets);
+            if (targetBudget == null)
+            {
+                Console.WriteLine("Unknown budget with id " + options.MoveTo);
+                return -1;
+            }
+            if (targetBudget.IsHistoric)
+            {
+                Console.WriteLine("Cannot move remaining balance to historic budget " + options.MoveTo);
+                return -1;
+            }
+
+            var summaries = summaryStorage.Get().ToList();
+            var sourceSummary = summaries.FirstOrDefault(s => s.BudgetId.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase));
+            var remainingAmount = sourceSummary?.Amount ?? 0;
+            if (sourceSummary != null)
+            {
+                summaries.Remove(sourceSummary);
+                summaries.Add(new Summary(options.Id, 0));
+            }
+
+            if (remainingAmount != 0)
+            {
+                var targetSummary = summaries.FirstOrDefault(s => s.BudgetId.Equals(options.MoveTo, StringComparison.InvariantCultureIgnoreCase));
+                if (targetSummary == null)
+                {
+                    summaries.Add(new Summary(options.MoveTo, remainingAmount));
+                }
+                else
+                {
+                    summaries.Remove(targetSummary);
+                    summaries.Add(new Summary(options.MoveTo, targetSummary.Amount + remainingAmount));
+                }
+            }
+            summaryStorage.Save(summaries);
+
+            budgets.Remove(budget);
+            budgets.Add(new Budget(budget.Name, budget.Id, null, true));
+            budgetStorage.Save(budgets);
+
+            var incomes = incomeStorage.Get().ToList();
+            var incomesUpdated = false;
+            for (var i = 0; i < incomes.Count; i++)
+            {
+                var income = incomes[i];
+                var distributions = income.Distribushings
+                    .Where(d => !d.BudgetId.Equals(options.Id, StringComparison.InvariantCultureIgnoreCase))
+                    .ToArray();
+                if (distributions.Length != income.Distribushings.Length)
+                {
+                    incomes[i] = new Income(income.Name, income.Id, distributions);
+                    incomesUpdated = true;
+                }
+            }
+            if (incomesUpdated)
+            {
+                incomeStorage.Save(incomes);
+            }
+
+            if (remainingAmount != 0)
+            {
+                Console.WriteLine("Moved " + remainingAmount + " from " + options.Id + " to " + options.MoveTo);
+            }
+            budgetPrinter.Print(budgets);
             return 0;
         }
 

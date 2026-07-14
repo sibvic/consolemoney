@@ -13,14 +13,17 @@ namespace Sibvic.ConsoleMoney.AppTests
             budgetReader = new Mock<IBudgetStorage>();
             summaryReader = new Mock<ISummaryStorage>();
             budgetPrinter = new Mock<IBudgetPrinter>();
+            incomeStorage = new Mock<IIncomeStorage>();
+            incomeStorage.Setup(c => c.Get()).Returns([]);
         }
         Mock<IBudgetStorage> budgetReader;
         Mock<ISummaryStorage> summaryReader;
         Mock<IBudgetPrinter> budgetPrinter;
+        Mock<IIncomeStorage> incomeStorage;
 
         BudgetController Create()
         {
-            return new BudgetController(budgetReader.Object, summaryReader.Object, budgetPrinter.Object);
+            return new BudgetController(budgetReader.Object, summaryReader.Object, budgetPrinter.Object, incomeStorage.Object);
         }
 
         [TestMethod]
@@ -161,6 +164,76 @@ namespace Sibvic.ConsoleMoney.AppTests
                 Id = "x",
                 Amount = "100.15"
             }));
+        }
+
+        [TestMethod]
+        public void Close()
+        {
+            var controller = Create();
+            budgetReader.Setup(c => c.Get()).Returns([
+                new Budget.Budget("old", "old", 10),
+                new Budget.Budget("main", "main", null)
+            ]);
+            summaryReader.Setup(r => r.Get()).Returns([
+                new Summary("old", 50),
+                new Summary("main", 100)
+            ]);
+            incomeStorage.Setup(c => c.Get()).Returns([
+                new Income("salary", "salary", [
+                    new IncomeDistribushing("old", 20),
+                    new IncomeDistribushing("main", 80)
+                ])
+            ]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Close = true,
+                Id = "old",
+                MoveTo = "main"
+            }));
+
+            budgetReader.Verify(w => w.Save(It.Is<IEnumerable<Budget.Budget>>(items =>
+                items.Count() == 2
+                && items.Any(b => b.Id == "old" && b.IsHistoric && b.DefaultPercent == null)
+                && items.Any(b => b.Id == "main" && !b.IsHistoric))));
+            summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
+                items.Count() == 2
+                && items.First(s => s.BudgetId == "old").Amount == 0
+                && items.First(s => s.BudgetId == "main").Amount == 150)));
+            incomeStorage.Verify(w => w.Save(It.Is<IEnumerable<Income>>(items =>
+                items.Count() == 1
+                && items.First().Distribushings.Length == 1
+                && items.First().Distribushings[0].BudgetId == "main")));
+        }
+
+        [TestMethod]
+        public void CloseUnknownBudget()
+        {
+            var controller = Create();
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("main", "main", null)]);
+            summaryReader.Setup(r => r.Get()).Returns([]);
+
+            Assert.AreEqual(-1, controller.Start(new()
+            {
+                Close = true,
+                Id = "old",
+                MoveTo = "main"
+            }));
+            budgetReader.Verify(w => w.Save(It.IsAny<IEnumerable<Budget.Budget>>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void CloseMissingMoveTo()
+        {
+            var controller = Create();
+            budgetReader.Setup(c => c.Get()).Returns([new Budget.Budget("old", "old", null)]);
+
+            Assert.AreEqual(-1, controller.Start(new()
+            {
+                Close = true,
+                Id = "old"
+            }));
+            budgetReader.Verify(w => w.Save(It.IsAny<IEnumerable<Budget.Budget>>()), Times.Never);
         }
     }
 }

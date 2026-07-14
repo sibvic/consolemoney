@@ -183,6 +183,38 @@ namespace Sibvic.ConsoleMoney.AppTests
         }
 
         [TestMethod]
+        public void AddSkipsHistoricBudgetDefaultPercent()
+        {
+            var controller = Create();
+            reader.Setup(r => r.Get()).Returns([]);
+            incomeReader.Setup(r => r.Get()).Returns([new Income("main income", "main", [
+                new IncomeDistribushing("invest", 10),
+                new IncomeDistribushing("", 1),
+                ])]);
+            summaryReader.Setup(r => r.Get()).Returns([new Summary("invest", 35)]);
+            budgetReader.Setup(r => r.Get()).Returns(
+                [
+                    new Budget.Budget("invest_", "invest", null),
+                    new Budget.Budget("old_", "old", 50, true),
+                    new Budget.Budget("coffee", "coffee", 0.01)
+                ]);
+
+            Assert.AreEqual(0, controller.Start(new()
+            {
+                Add = true,
+                Amount = "100",
+                IncomeId = "main",
+                Comment = "test"
+            }));
+            summaryReader.Verify(w => w.Save(It.Is<IEnumerable<Summary>>(items =>
+                items.Count() == 2
+                && items.ElementAt(0).BudgetId == "invest" && items.ElementAt(0).Amount == 45
+                && items.ElementAt(1).BudgetId == "coffee" && items.ElementAt(1).Amount == 0.01
+                && items.All(s => s.BudgetId != "old")
+            )));
+        }
+
+        [TestMethod]
         public void AddBadAmount()
         {
             var controller = Create();

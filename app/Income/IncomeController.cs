@@ -56,6 +56,11 @@ namespace Sibvic.ConsoleMoney
                     Console.WriteLine("Unknown budget " + options.BudgetId);
                     return -1;
                 }
+                if (budget.IsHistoric)
+                {
+                    Console.WriteLine("Cannot set distribution for historic budget " + options.BudgetId);
+                    return -1;
+                }
 
                 var distributions = income.Distribushings.ToList();
                 var distribution = distributions.FirstOrDefault(d => d.BudgetId.Equals(options.BudgetId, StringComparison.InvariantCultureIgnoreCase));
@@ -78,7 +83,7 @@ namespace Sibvic.ConsoleMoney
         {
             Console.Write("- " + income.Name + " (" + income.Id + ") ");
             var prefix = "";
-            foreach (var budget in budgets)
+            foreach (var budget in budgets.Where(b => !b.IsHistoric))
             {
                 var distribushing = income.Distribushings
                     .FirstOrDefault(d => d.BudgetId.Equals(budget.Id, StringComparison.InvariantCultureIgnoreCase));

@@ -133,7 +133,7 @@ namespace Sibvic.ConsoleMoney
             table.AddChildren(new Cell { Stroke = LineThickness.Double, Align = Align.Right, Color = ConsoleColor.Yellow }
                 .AddChildren(grandTotal.ToString("F2")));
 
-            ConsoleRenderer.RenderDocument(new Document().AddChildren(table));
+            ConsoleDocumentRenderer.Render(new Document().AddChildren(table));
         }
     }
 }

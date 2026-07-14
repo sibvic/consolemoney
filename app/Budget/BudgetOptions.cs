@@ -24,5 +24,10 @@ namespace Sibvic.ConsoleMoney.Budget
         public bool SetDefaultPercent { get; set; }
         [Option("percent", HelpText = "Default percent.")]
         public string? DefaultPercent { get; set; }
+
+        [Option('c', "close", HelpText = "Close a budget (mark as historic, remove from income distribution).")]
+        public bool Close { get; set; }
+        [Option("move-to", HelpText = "Budget id to move remaining balance to when closing.")]
+        public string? MoveTo { get; set; }
     }
 }

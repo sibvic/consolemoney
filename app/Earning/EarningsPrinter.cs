@@ -15,7 +15,6 @@ namespace Sibvic.ConsoleMoney.Earning
         public void PrintLastNEarnings(IEnumerable<Earning> earnings, int n)
         {
             var lastNEarnings = earnings.OrderByDescending(e => e.Date).Take(n).ToList();
-            
             if (!lastNEarnings.Any())
             {
                 Console.WriteLine("No earnings found.");
@@ -62,7 +61,9 @@ namespace Sibvic.ConsoleMoney.Earning
                 );
             }
 
-            ConsoleRenderer.RenderDocument(new Document().AddChildren(table));
+            var doc = new Document();
+            doc.Children.Add(table);
+            ConsoleDocumentRenderer.Render(doc);
         }
     }
 } 

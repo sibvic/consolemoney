@@ -46,7 +46,7 @@ namespace Sibvic.ConsoleMoney.Spending
                         .AddChildren($"-{spentAmount:F2}")
                 );
 
-            ConsoleRenderer.RenderDocument(new Document().AddChildren(table));
+            ConsoleDocumentRenderer.Render(new Document().AddChildren(table));
         }
     }
 } 

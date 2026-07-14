@@ -83,6 +83,7 @@ namespace Sibvic.ConsoleMoney.Earning
             double amountWithRate)
         {
             var budgets = budgetReader.Get()
+                .Where(b => !b.IsHistoric)
                 .Where(b => !distribushings.Any(d => d.BudgetId.Equals(b.Id, StringComparison.InvariantCultureIgnoreCase)));
             foreach (var budget in budgets)
             {

@@ -153,5 +153,22 @@ namespace Sibvic.ConsoleMoney.AppTests
                 DistributionPercent = "1z4.1"
             }));
         }
+
+        [TestMethod]
+        public void SetDistributionHistoricBudget()
+        {
+            var controller = Create();
+            reader.Setup(c => c.Get()).Returns([new Income("", "n", [])]);
+            budgetReader.Setup(r => r.Get()).Returns([new Budget.Budget("", "main", null, true)]);
+
+            Assert.AreEqual(-1, controller.Start(new()
+            {
+                SetDistribution = true,
+                Id = "n",
+                BudgetId = "main",
+                DistributionPercent = "14.1"
+            }));
+            reader.Verify(w => w.Save(It.IsAny<IEnumerable<Income>>()), Times.Never);
+        }
     }
 }

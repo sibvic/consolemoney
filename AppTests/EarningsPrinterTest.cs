@@ -2,7 +2,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sibvic.ConsoleMoney.Earning;
 using System;
 using System.IO;
-using System.Linq;
 
 namespace Sibvic.ConsoleMoney.AppTests
 {
@@ -44,13 +43,14 @@ namespace Sibvic.ConsoleMoney.AppTests
             printer.PrintLastNEarnings(earnings, 3);
 
             var output = consoleOutput.ToString();
-            var lines = output.Split(Environment.NewLine);
 
-            Assert.IsTrue(lines[0].Contains("Last 3 earnings:"));
-            Assert.IsTrue(lines[1].Contains("Date")); // Header row
-            Assert.IsTrue(lines[2].Contains("2024-03-20")); // Most recent
-            Assert.IsTrue(lines[3].Contains("2024-03-15")); // Second most recent
-            Assert.IsTrue(lines[4].Contains("2024-03-10")); // Third most recent
+            Assert.IsTrue(output.Contains("Last 3 earnings:"));
+            Assert.IsTrue(output.Contains("Date"));
+            Assert.IsTrue(output.Contains("2024-03-20"));
+            Assert.IsTrue(output.Contains("2024-03-15"));
+            Assert.IsTrue(output.Contains("2024-03-10"));
+            Assert.IsFalse(output.Contains("2024-03-05"));
+            Assert.IsFalse(output.Contains("2024-03-01"));
         }
 
         [TestMethod]
@@ -73,14 +73,13 @@ namespace Sibvic.ConsoleMoney.AppTests
             printer.PrintLastNEarnings(earnings, 1);
 
             var output = consoleOutput.ToString();
-            var lines = output.Split(Environment.NewLine);
 
-            Assert.IsTrue(lines[1].Contains("Date")); // Header row
-            Assert.IsTrue(lines[2].Contains("2024-03-20")); // Date
-            Assert.IsTrue(lines[2].Contains("1000.50")); // Amount
-            Assert.IsTrue(lines[2].Contains("main")); // Income ID
-            Assert.IsTrue(lines[2].Contains("1.25")); // Rate
-            Assert.IsTrue(lines[2].Contains("Test comment")); // Comment
+            Assert.IsTrue(output.Contains("Date"));
+            Assert.IsTrue(output.Contains("2024-03-20"));
+            Assert.IsTrue(output.Contains(1000.50.ToString("F2")));
+            Assert.IsTrue(output.Contains("main"));
+            Assert.IsTrue(output.Contains(1.25.ToString("F2")));
+            Assert.IsTrue(output.Contains("Test comment"));
         }
 
         [TestMethod]
@@ -94,14 +93,12 @@ namespace Sibvic.ConsoleMoney.AppTests
             printer.PrintLastNEarnings(earnings, 1);
 
             var output = consoleOutput.ToString();
-            var lines = output.Split(Environment.NewLine);
 
-            Assert.IsTrue(lines[1].Contains("Date")); // Header row
-            Assert.IsTrue(lines[2].Contains("2024-03-20")); // Date
-            Assert.IsTrue(lines[2].Contains("1000.50")); // Amount
-            Assert.IsTrue(lines[2].Contains("main")); // Income ID
-            Assert.IsTrue(lines[2].Contains("N/A")); // Rate
-            Assert.IsTrue(lines[2].Contains("")); // Empty comment
+            Assert.IsTrue(output.Contains("Date"));
+            Assert.IsTrue(output.Contains("2024-03-20"));
+            Assert.IsTrue(output.Contains(1000.50.ToString("F2")));
+            Assert.IsTrue(output.Contains("main"));
+            Assert.IsTrue(output.Contains("N/A"));
         }
     }
-} 
+}

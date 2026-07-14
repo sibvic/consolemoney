@@ -13,6 +13,7 @@ namespace Sibvic.ConsoleMoney.Budget
                     new Column { Width = GridLength.Auto },
                     new Column { Width = GridLength.Auto },
                     new Column { Width = GridLength.Auto },
+                    new Column { Width = GridLength.Auto },
                     new Column { Width = GridLength.Auto }
                 )
                 .AddChildren(
@@ -24,6 +25,8 @@ namespace Sibvic.ConsoleMoney.Budget
                         .AddChildren("Amount"),
                     new Cell { Stroke = LineThickness.Double, Color = ConsoleColor.White }
                         .AddChildren("Def %"),
+                    new Cell { Stroke = LineThickness.Double, Color = ConsoleColor.White }
+                        .AddChildren("Historic"),
                     budgets.Select(budget => new[] {
                         new Cell { Stroke = LineThickness.None }
                             .AddChildren(budget.Name),
@@ -34,10 +37,12 @@ namespace Sibvic.ConsoleMoney.Budget
                             .Select(s => s.Amount)
                             .FirstOrDefault(0).ToString("n0")),
                         new Cell { Stroke = LineThickness.None, Align = Align.Right }
-                            .AddChildren(budget.DefaultPercent == null ? "" : budget.DefaultPercent.Value.ToString("0.00"))
+                            .AddChildren(budget.DefaultPercent == null ? "" : budget.DefaultPercent.Value.ToString("0.00")),
+                        new Cell { Stroke = LineThickness.None }
+                            .AddChildren(budget.IsHistoric ? "yes" : "")
                     })
                 );
-            ConsoleRenderer.RenderDocument(new Document().AddChildren(table));
+            ConsoleDocumentRenderer.Render(new Document().AddChildren(table));
         }
     }
 }
