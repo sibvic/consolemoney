@@ -6,11 +6,14 @@ using Sibvic.ConsoleMoney.Project;
 using Sibvic.ConsoleMoney.Spending;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 var homeDir = OptionsStorage.GetHomeDir(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", ""));
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+// Avoid Windows Event Log provider (needs RID-specific assets not always present in deploy).
+builder.Logging.ClearProviders();
 builder.Services.AddSingleton<IBudgetStorage>(new BudgetJsonStorage(homeDir));
 builder.Services.AddSingleton<ISummaryStorage>(new SummaryJsonStorage(homeDir));
 builder.Services.AddSingleton<IIncomeStorage>(new IncomeJsonStorage(homeDir));
